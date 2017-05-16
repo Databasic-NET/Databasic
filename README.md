@@ -5,7 +5,7 @@ C#/VB.NET database utility to comfortly write pure Microsoft SQL/MySQL queries a
 ```vb
 ' create active record class extending DbSharp.Model:
 Public Class Dealer
-    Inherits Database.Model
+    Inherits DbSharp.Model
     Public Id As Int32?
     Public Property Firstname As String
     Public Property Secondname As String
@@ -35,8 +35,8 @@ Dim dct As Dictionary(Of Int32, Dealer) = Command.Prepare(
 ```
 
 ```cs
-' create active record class extending DbSharp.Model:
-public class Dealer: Database.Model {
+// create active record class extending DbSharp.Model:
+public class Dealer: DbSharp.Model {
     public int? Id;
     public string Firstname { get; set; }
     public string Secondname { get; set; }
@@ -49,16 +49,16 @@ Dealer instance = Command.Prepare(
     id = 5
 }).ToInstance<Dealer>()
 
-' load all dealers with id higher than 5 into list
+// load all dealers with id higher than 5 into list
 List<Dealer> list = Command.Prepare(
     "SELECT * FROM Dealers WHERE Id > @id"
 ).FetchAll(new {
     id = 5
 }).ToList<Dealer>()
 
-' load all dealers with id higher than 5 into dictionary
-' and complete dictionary keys by Id column
-Dim dct As Dictionary<Int32, Dealer> = Command.Prepare(
+// load all dealers with id higher than 5 into dictionary
+// and complete dictionary keys by Id column
+Dictionary<Int32, Dealer> dct = Command.Prepare(
     "SELECT * FROM Dealers WHERE Id > @id"
 ).FetchAll(new {
     id = 5
