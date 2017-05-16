@@ -8,10 +8,10 @@ Imports System.Runtime.InteropServices
 
 ' Review the values of the assembly attributes
 
-<Assembly: AssemblyTitle("Database")> 
-<Assembly: AssemblyDescription("")> 
-<Assembly: AssemblyCompany("")> 
-<Assembly: AssemblyProduct("Database")> 
+<Assembly: AssemblyTitle("DbSharp")>
+<Assembly: AssemblyDescription("C#/VB.NET database utility to comfortly write pure Microsoft SQL/MySQL queries and load them into typed classes and collections.")>
+<Assembly: AssemblyCompany("Tom Flidr")>
+<Assembly: AssemblyProduct("DbSharp")>
 <Assembly: AssemblyCopyright("Copyright ©  2017")> 
 <Assembly: AssemblyTrademark("")> 
 

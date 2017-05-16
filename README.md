@@ -1,5 +1,5 @@
 # DbSharp
-Main package
+C#/VB.NET database utility to comfortly write pure Microsoft SQL/MySQL queries and load them into typed classes and collections.
 
 ## Basic Examples
 ```vb
