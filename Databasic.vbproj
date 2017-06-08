@@ -78,7 +78,6 @@
     <Compile Include="Connection\Closing.vb" />
     <Compile Include="Provider\Resource\Getters.vb" />
     <Compile Include="Connection.vb" />
-    <Compile Include="Tools.vb" />
     <Compile Include="Transaction.vb" />
     <Compile Include="Connection\StaticInit.vb" />
     <Compile Include="Database.vb" />
@@ -111,7 +110,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Databasic.nuspec" />
-    <None Include="Databasic.config.example" />
     <None Include="My Project\Application.myapp">
       <Generator>MyApplicationCodeGenerator</Generator>
       <LastGenOutput>Application.Designer.vb</LastGenOutput>
