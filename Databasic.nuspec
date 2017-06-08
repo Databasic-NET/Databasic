@@ -1,0 +1,33 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
+	<metadata minClientVersion="2.6">
+		<id>Databasic.Core</id>
+		<version>1.0.0.0</version>
+		<title>Databasic - Core Package</title>
+		<authors>Tom Flidr</authors>
+		<owners>Tom Flidr</owners>
+		<licenseUrl>https://opensource.org/licenses/BSD-3-Clause</licenseUrl>
+		<projectUrl>https://github.com/databasic-net</projectUrl>
+		<iconUrl>https://raw.githubusercontent.com/databasic-net/databasic/master/gfx/databasic-icon.ico</iconUrl>
+		<language>en-US</language>
+		<requireLicenseAcceptance>false</requireLicenseAcceptance>
+		<description>
+      Databasic - C#/VB.NET database utility
+      - focusing on queries primarily based on pure SQL commands, no linq transations
+      - arranging data into primitive types, typed active record classes, collections and more
+      - allowing to run any nonselect queries
+      This is core package!
+      Install this package only with specific database package like: 
+        - Databasic.&#60;DatabaseType&#62;
+    </description>
+		<copyright>Copyright ©	2017</copyright>
+    <tags>microsoft sql mssql tsql database query command select insert update delete dml tool utility</tags>
+		<dependencies>
+      <dependency id="System" version="4.0.0.0" />
+      <dependency id="System.Core" version="4.0.0.0" />
+      <dependency id="System.Data" version="4.0.0.0" />
+      <dependency id="System.Configuration" version="4.0.0.0" />
+		</dependencies>
+		<releaseNotes>https://github.com/databasic-net/databasic/releases</releaseNotes>
+	</metadata>
+</package>

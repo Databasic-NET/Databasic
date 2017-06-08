@@ -26,7 +26,7 @@ $releaseNotes = ""
 #	e.g. $configuration = "Release"
 #		 $platform = "AnyCPU"
 $configuration = ""
-$platform = ""
+$platform = "AnyCPU"
 
 # Specify any NuGet Pack Properties to pass to MsBuild.
 #	e.g. $packProperties = "TargetFrameworkVersion=v3.5;Optimize=true"

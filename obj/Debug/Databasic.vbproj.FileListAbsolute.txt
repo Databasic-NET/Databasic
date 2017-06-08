@@ -1,0 +1,8 @@
+C:\works\tec\vb\dbsharp\Databasic\bin\Debug\Databasic.dll
+C:\works\tec\vb\dbsharp\Databasic\bin\Debug\Databasic.pdb
+C:\works\tec\vb\dbsharp\Databasic\bin\Debug\Databasic.xml
+C:\works\tec\vb\dbsharp\Databasic\obj\Debug\Databasic.Resources.resources
+C:\works\tec\vb\dbsharp\Databasic\obj\Debug\Databasic.vbproj.GenerateResource.Cache
+C:\works\tec\vb\dbsharp\Databasic\obj\Debug\Databasic.dll
+C:\works\tec\vb\dbsharp\Databasic\obj\Debug\Databasic.xml
+C:\works\tec\vb\dbsharp\Databasic\obj\Debug\Databasic.pdb

@@ -1,0 +1,6 @@
+C:\works\tec\vb\dbsharp\Databasic\obj\Debug\Databasic.Core.vbprojResolveAssemblyReference.cache
+C:\works\tec\vb\dbsharp\Databasic\obj\Debug\Databasic.Resources.resources
+C:\works\tec\vb\dbsharp\Databasic\obj\Debug\Databasic.Core.vbproj.GenerateResource.Cache
+C:\works\tec\vb\dbsharp\Databasic\obj\Debug\Databasic.xml
+C:\works\tec\vb\dbsharp\Databasic\obj\Debug\Databasic.Core.Resources.resources
+C:\works\tec\vb\dbsharp\Databasic\obj\Debug\Databasic.Core.xml
