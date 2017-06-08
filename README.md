@@ -1,6 +1,15 @@
-# DbSharp Database Utility
-C#/VB.NET SQL tool to comfortly write pure Microsoft SQL/MySQL queries and load them into typed classes and collections.
+# Databasic - Core Package
 
+ Databasic - C#/VB.NET database utility
+ - focusing on queries primarily based on pure SQL commands, no linq transations
+- arranging data into primitive types, typed active record classes, collections and more
+- allowing to run any nonselect queries
+
+**This is core package!**
+Install this package only with specific database package like: 
+- Databasic.&#60;DatabaseType&#62;
+
+// TODO:
 ## Basic Examples
 ```vb
 ' create active record class extending DbSharp.Model:
