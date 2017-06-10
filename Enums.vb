@@ -18,3 +18,8 @@ Public Enum IsolationLevel
     Snapshot = &H1000000
     Unspecified = -1
 End Enum
+
+Public Enum KeyType
+    Primary
+    Unique
+End Enum

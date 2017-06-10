@@ -21,20 +21,20 @@ Partial Public MustInherit Class Connection
                 Connection._initialized = True
                 Connection._staticInitCompleteConfig()
                 Connection._staticInitCompleteProviders()
-                ActiveRecord.Resource.StaticInit(Databasic.Connection._config.Count)
+                ActiveRecord.Resource.StaticInit(Databasic.Connection.Config.Count)
             End If
         End SyncLock
     End Sub
 
     Private Shared Sub _staticInitCompleteConfig()
-        If (Databasic.Connection._config.Count = 0) Then
+        If (Databasic.Connection.Config.Count = 0) Then
             Dim config As ConnectionStringsSection = DirectCast(
                     ConfigurationManager.GetSection("connectionStrings"),
                     ConnectionStringsSection
                 )
             Dim i As Int16 = 0
             For Each cfgItem As ConnectionStringSettings In config.ConnectionStrings
-                Databasic.Connection._config.Add(
+                Databasic.Connection.Config.Add(
                     i, New String() {cfgItem.ProviderName, cfgItem.ConnectionString}
                 )
                 Databasic.Connection.NamesAndIndexes.Add(cfgItem.Name, i)

@@ -78,6 +78,7 @@
     <Compile Include="Connection\Closing.vb" />
     <Compile Include="Provider\Resource\Getters.vb" />
     <Compile Include="Connection.vb" />
+    <Compile Include="Structs.vb" />
     <Compile Include="Transaction.vb" />
     <Compile Include="Connection\StaticInit.vb" />
     <Compile Include="Database.vb" />
