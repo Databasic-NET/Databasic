@@ -7,32 +7,30 @@ Imports Databasic
 
 Partial Public MustInherit Class Connection
 
-
     ''' <summary>
     ''' Load config and set up connection strings.
     ''' </summary>
     Shared Sub New()
-        Connection.StaticInit()
-    End Sub
-
-    Friend Shared Sub StaticInit()
-        SyncLock Connection._staticInitLock
-            If Not Connection._initialized Then
-                Connection._initialized = True
-                Connection._staticInitCompleteConfig()
-                Connection._staticInitCompleteProviders()
-                ActiveRecord.Resource.StaticInit(Databasic.Connection.Config.Count)
-            End If
-        End SyncLock
+        Connection._staticInitDoneLock.EnterUpgradeableReadLock()
+        If Not Connection._staticInitDone Then
+            Connection._staticInitDoneLock.EnterWriteLock()
+            Connection._staticInitDoneLock.ExitUpgradeableReadLock()
+            Connection._staticInitDone = True
+            Connection._staticInitCompleteConfig()
+            Connection._staticInitCompleteProviders()
+            Connection._staticInitDoneLock.ExitWriteLock()
+        Else
+            Connection._staticInitDoneLock.ExitUpgradeableReadLock()
+        End If
     End Sub
 
     Private Shared Sub _staticInitCompleteConfig()
         If (Databasic.Connection.Config.Count = 0) Then
             Dim config As ConnectionStringsSection = DirectCast(
-                    ConfigurationManager.GetSection("connectionStrings"),
-                    ConnectionStringsSection
-                )
-            Dim i As Int16 = 0
+                ConfigurationManager.GetSection("connectionStrings"),
+                ConnectionStringsSection
+            )
+            Dim i As Int32 = 0
             For Each cfgItem As ConnectionStringSettings In config.ConnectionStrings
                 Databasic.Connection.Config.Add(
                     i, New String() {cfgItem.ProviderName, cfgItem.ConnectionString}

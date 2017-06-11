@@ -1,9 +1,6 @@
-﻿Imports System.Configuration
-Imports System.Data.Common
-Imports System.IO
+﻿Imports System.Data.Common
 Imports System.Reflection
 Imports System.Threading
-Imports Databasic
 
 Partial Public MustInherit Class Connection
 
@@ -22,6 +19,10 @@ Partial Public MustInherit Class Connection
     Public Overridable Property Resource As ActiveRecord.Resource
 
     ''' <summary>
+    ''' Parsed subnode values from node &lt;connectionStrings&gt; in (App|Web).config file.
+    ''' </summary>
+    Friend Shared Config As New Dictionary(Of Int32, String())
+    ''' <summary>
     ''' (App|Web).config connection names with their indexes.
     ''' </summary>
     Friend Shared NamesAndIndexes As New Dictionary(Of String, Int32)
@@ -32,11 +33,11 @@ Partial Public MustInherit Class Connection
     ''' <summary>
     ''' Threads semahore to read/write into managed connections store.
     ''' </summary>
-    Private Shared _staticInitLock As New Object()
+    Private Shared _staticInitDoneLock As New ReaderWriterLockSlim()
     ''' <summary>
     ''' True if static initialization completed, nothing else.
     ''' </summary>
-    Private Shared _initialized As Boolean = False
+    Private Shared _staticInitDone As Boolean = False
 
     ''' <summary>
     ''' Supported database providers.
@@ -45,17 +46,11 @@ Partial Public MustInherit Class Connection
     ''' <summary>
     ''' All Databasic connections managed store for all processes and for all threads.
     ''' </summary>
-    Private Shared _connections As New Dictionary(Of String, Dictionary(Of Int16, Connection))
+    Private Shared _connectionsRegister As New Dictionary(Of String, Dictionary(Of Int32, Connection))
 
 
 
-    Public Overridable Sub Open(dsn As String)
-        'Me.Provider = New DbConnection(dsn)
-        'Me.Provider.Open()
-        'AddHandler Me.Provider.InfoMessage, AddressOf Databasic.Connection.ExecuteErrorHandlers
-    End Sub
-
-    Friend Shared Function GetIndexByName(connectionName As String) As Int16
+    Friend Shared Function GetIndexByName(connectionName As String) As Int32
         If Databasic.Connection.NamesAndIndexes.ContainsKey(connectionName) Then
             Return Databasic.Connection.NamesAndIndexes(connectionName)
         Else

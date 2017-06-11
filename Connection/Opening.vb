@@ -1,62 +1,94 @@
-﻿Imports System.Configuration
-Imports System.Data.Common
-Imports System.Reflection
-Imports System.Threading
-Imports Databasic
-Imports Databasic.Connections
+﻿Imports System.Threading
 
 Partial Public MustInherit Class Connection
 
-
-
-
-
-
-
-
     ''' <summary>
-    ''' Parsed subnode values from node &lt;connectionStrings&gt; in (App|Web).config file.
+    ''' Create and open new connection and set it into Provider property, register InfoMessage handler
     ''' </summary>
-    Friend Shared Config As New Dictionary(Of Int16, String())
-
-
+    ''' <param name="dsn">Database dsn connection string, usually with server address, username and password.</param>
+    Public MustOverride Sub Open(dsn As String)
 
     ''' <summary>
-    ''' Get and open connection by config index.
+    ''' Get (and open if necessary) registered connection instance by config index, internaly by process id and thread id.
     ''' </summary>
     ''' <param name="connectionIndex">Config connection index.</param>
-    ''' <returns></returns>
-    Public Shared Function [Get](Optional connectionIndex As Int16 = Database.DEFAUT_CONNECTION_INDEX) As Connection
+    ''' <returns>New opened or existing connection instance with registered InfoMessage handler, registered in internal store.</returns>
+    Public Shared Function [Get](Optional connectionIndex As Int32 = Database.DEFAUT_CONNECTION_INDEX) As Connection
         If Not Databasic.Connection.Config.ContainsKey(connectionIndex) Then
             Events.RaiseError(New Exception($"Connection settings under index doesn't exist: {connectionIndex}."))
         End If
-        Dim connection As Connection = Nothing
-        Dim typeAndDsn As String()
-        Dim provider As String
-        Dim connectionType As Type
+        Dim connection As Databasic.Connection
         Dim processAndThreadKey As String = Databasic.Connection._getProcessAndThreadKey()
-        If (
-            Databasic.Connection._connections.ContainsKey(processAndThreadKey) AndAlso
-            Databasic.Connection._connections(processAndThreadKey).ContainsKey(connectionIndex)
-        ) Then
-            connection = Databasic.Connection._connections(processAndThreadKey).Item(connectionIndex)
-        Else
-            typeAndDsn = Databasic.Connection.Config(connectionIndex)
-            provider = typeAndDsn(0).Trim()
-            If Not Databasic.Connection._supportedProviders.ContainsKey(provider) Then
-                Events.RaiseError(New Exception($"Connection provider not installed: '{provider}'."))
+        Dim processAndThreadLock As ReaderWriterLockSlim
+        Dim processAndThreadConnections As Dictionary(Of Int32, Connection)
+        ' A. read check begin - if register contains any connection records under process and thread key
+        Databasic.Connection._registerLock.EnterUpgradeableReadLock()
+        ' check if register contains any connection records under process and thread key
+        If Databasic.Connection._connectionsRegister.ContainsKey(processAndThreadKey) Then
+            ' register contains any connection records under process and thread key - fill local variables to use them later
+            processAndThreadLock = Databasic.Connection._registerLocks(processAndThreadKey)
+            processAndThreadConnections = Databasic.Connection._connectionsRegister(processAndThreadKey)
+
+            ' C. read check begin - if process and thread record contains connection under called index
+            processAndThreadLock.EnterUpgradeableReadLock()
+            ' check if process and thread record contains connection under called index
+            If processAndThreadConnections.ContainsKey(connectionIndex) Then
+                ' process and thread record contains connection under called index - let's read connection record
+                connection = processAndThreadConnections(connectionIndex)
+                ' C. read check end - if process and thread record contains connection under called index
+                processAndThreadLock.ExitUpgradeableReadLock()
+            Else
+                ' process and thread record doesn't contain connection under called index - let's create new connection record
+                ' D. write lock begin - to change process and thread record under called index
+                processAndThreadLock.EnterWriteLock()
+                ' C. read check end - if process and thread record contains connection under called index
+                processAndThreadLock.ExitUpgradeableReadLock()
+                ' create new connection record
+                connection = Databasic.Connection._createAndOpen(connectionIndex)
+                ' D. write lock end - to change process and thread record under called index
+                processAndThreadLock.ExitWriteLock()
             End If
-            connectionType = Databasic.Connection._supportedProviders(provider)
-            Try
-                connection = Activator.CreateInstance(connectionType)
-                connection.Open(typeAndDsn(1).Trim())
-            Catch ex As Exception
-                Events.RaiseError(ex, New EventArgs())
-            End Try
-            Databasic.Connection._register(processAndThreadKey, connectionIndex, connection)
+
+            ' A. read check end - if register contains any connection records under process and thread key
+            Databasic.Connection._registerLock.ExitUpgradeableReadLock()
+        Else
+            ' register doesn't contain any connection records under process and thread key
+            ' B. write lock begin - to change register records under process and thread key
+            Databasic.Connection._registerLock.EnterWriteLock()
+            ' A. read check end - if register contains any connection records under process and thread key
+            Databasic.Connection._registerLock.ExitUpgradeableReadLock()
+            ' lets change the register - add connection records under thread and process key
+            processAndThreadLock = New ReaderWriterLockSlim()
+            processAndThreadConnections = New Dictionary(Of Int32, Connection)()
+            Databasic.Connection._registerLocks.Add(processAndThreadKey, processAndThreadLock)
+            Databasic.Connection._connectionsRegister.Add(processAndThreadKey, processAndThreadConnections)
+
+            ' C. read check begin - if process and thread record contains connection under called index
+            processAndThreadLock.EnterUpgradeableReadLock()
+            ' check if process and thread record contains connection under called index
+            If processAndThreadConnections.ContainsKey(connectionIndex) Then
+                ' process and thread record contains connection under called index - let's read connection record
+                connection = processAndThreadConnections(connectionIndex)
+                ' C. read check end - if process and thread record contains connection under called index
+                processAndThreadLock.ExitUpgradeableReadLock()
+            Else
+                ' process and thread record doesn't contain connection under called index - let's create new connection record
+                ' D. write lock begin - to change process and thread record under called index
+                processAndThreadLock.EnterWriteLock()
+                ' C. read check end - if process and thread record contains connection under called index
+                processAndThreadLock.ExitUpgradeableReadLock()
+                ' create new connection record
+                connection = Databasic.Connection._createAndOpen(connectionIndex)
+                ' D. write lock end - to change process and thread record under called index
+                processAndThreadLock.ExitWriteLock()
+            End If
+
+            ' B. write lock end - to change register records under process and thread key
+            Databasic.Connection._registerLock.ExitWriteLock()
         End If
         Return connection
     End Function
+
     ''' <summary>
     ''' Get and open connection by config name.
     ''' </summary>
@@ -66,18 +98,26 @@ Partial Public MustInherit Class Connection
         Return Databasic.Connection.Get(Connection.GetIndexByName(connectionName))
     End Function
 
-    Private Shared Sub _register(processAndThreadKey As String, connectionIndex As Int32, conn As Connection)
-        Dim conns As Dictionary(Of Int16, Connection)
-        SyncLock Databasic.Connection._closingLock
-            If Databasic.Connection._connections.ContainsKey(processAndThreadKey) Then
-                conns = Databasic.Connection._connections(processAndThreadKey)
-                conns(connectionIndex) = conn
-            Else
-                Databasic.Connection._connections.Add(processAndThreadKey, New Dictionary(Of Short, Connection) From {
-                    {connectionIndex, conn}
-                })
-            End If
-        End SyncLock
-    End Sub
+    ''' <summary>
+    ''' Create new connection instance by connection index and returns it
+    ''' </summary>
+    ''' <param name="connectionIndex">Config connection index.</param>
+    ''' <returns>New opened connection instance with registered InfoMessage handler.</returns>
+    Private Shared Function _createAndOpen(connectionIndex As Int32) As Connection
+        Dim result As Connection = Nothing
+        Dim typeAndDsn As String() = Databasic.Connection.Config(connectionIndex)
+        Dim provider As String = typeAndDsn(0).Trim()
+        If Not Databasic.Connection._supportedProviders.ContainsKey(provider) Then
+            Events.RaiseError(New Exception($"Connection provider not installed: '{provider}'."))
+        End If
+        Dim connectionType As Type = Databasic.Connection._supportedProviders(provider)
+        Try
+            result = Activator.CreateInstance(connectionType)
+            result.Open(typeAndDsn(1).Trim())
+        Catch ex As Exception
+            Events.RaiseError(ex, New EventArgs())
+        End Try
+        Return result
+    End Function
 
 End Class

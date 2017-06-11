@@ -20,6 +20,18 @@ Public Enum IsolationLevel
 End Enum
 
 Public Enum KeyType
+    None
     Primary
     Unique
+End Enum
+
+Public Enum DuplicateKeyBehaviour
+    ThrownException
+    KeepFirstValue
+    OverwriteByNewValue
+End Enum
+
+Public Enum MemberInfoType
+    Prop
+    Field
 End Enum

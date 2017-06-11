@@ -1,5 +1,4 @@
 ﻿Imports System.Data.Common
-Imports Databasic.Connections
 
 Public MustInherit Class Statement
 
@@ -84,7 +83,7 @@ Public MustInherit Class Statement
     ''' default value is 0 to use first connection settings subnode from &lt;connectionStrings&gt; config node.
     ''' </param>
     ''' <returns>New specificly typed SQL statement by connection.</returns>
-    Public Shared Function Prepare(sql As String, Optional connectionIndex As Int16 = Database.DEFAUT_CONNECTION_INDEX) As Statement
+    Public Shared Function Prepare(sql As String, Optional connectionIndex As Int32 = Database.DEFAUT_CONNECTION_INDEX) As Statement
         Return Statement.create(sql, Connection.Get(connectionIndex))
     End Function
     ''' <summary>
@@ -228,23 +227,17 @@ Public MustInherit Class Statement
 
 
 
+
     ''' <summary>
-    ''' Create desired variable type from single row and single column select result.
-    ''' Specify result variable type by generic argument.
+    ''' Create new instance by generic type and set up all called reader columns with one row at minimal into 
+    ''' new instance properties or fields. If TResult is primitive type, reader has to return single row and 
+    ''' single column select result and that result is converted and returned as to primitive value only.
+    ''' If reader has no rows, Nothing is returned.
     ''' </summary>
-    ''' <typeparam name="TValue">Result result variable type.</typeparam>
-    ''' <returns>Retyped single row and single column select result.</returns>
-    Public Function ToValue(Of TValue)() As TValue
-        Return Core.Reader.ToValue(Of TValue)(Me.Reader)
-    End Function
-    ''' <summary>
-    ''' Create desired class instance type from single row and multicolumn column select result.
-    ''' Specify result class instance type by generic argument.
-    ''' </summary>
-    ''' <typeparam name="TActiveRecord">New result class instance type.</typeparam>
+    ''' <typeparam name="TResult">New result class instance type or any primitive type for single row and single column select result.</typeparam>
     ''' <returns>New instance by generic type with values by generic argument.</returns>
-    Public Function ToInstance(Of TActiveRecord)() As TActiveRecord
-        Return Core.Reader.ToInstance(Of TActiveRecord)(Me.Reader)
+    Public Function ToInstance(Of TResult)() As TResult
+        Return ActiveRecord.Entity.ToInstance(Of TResult)(Me.Reader)
     End Function
     ''' <summary>
     ''' Create List of desired class instance types or List of variables from singlerow 
@@ -255,7 +248,7 @@ Public MustInherit Class Statement
     ''' <typeparam name="TActiveRecord">Result List item generic type.</typeparam>
     ''' <returns>List of new instances/variables by generic type with values by generic argument.</returns>
     Public Function ToList(Of TActiveRecord)() As List(Of TActiveRecord)
-        Return Core.Reader.ToList(Of TActiveRecord)(Me.Reader)
+        Return ActiveRecord.Entity.ToList(Of TActiveRecord)(Me.Reader)
     End Function
     ''' <summary>
     ''' Create Dictionary of values by desired class instance types or Dictionary of values by variables 
@@ -267,11 +260,11 @@ Public MustInherit Class Statement
     ''' </summary>
     ''' <typeparam name="TKey">Result Dictionary generic type to complete Dictionary keys.</typeparam>
     ''' <typeparam name="TActiveRecord">Result Dictionary generic type to complete Dictionary values.</typeparam>
-    ''' <param name="keyColumnName">Reader column name to use to complete result dictionary keys.</param>
+    ''' <param name="databaseKeyColumnName">Reader column name to use to complete result dictionary keys.</param>
     ''' <param name="throwExceptionInDuplicateKey">True to thrown Exception if any previous key will be founded by completing the result Dictionary, False to overwrite any previous value in Dictionary, True by default.</param>
     ''' <returns>Dictionary of new instances/variables by generic type with values by generic argument.</returns>
-    Public Function ToDictionary(Of TKey, TActiveRecord)(Optional keyColumnName As String = "", Optional throwExceptionInDuplicateKey As Boolean = True) As Dictionary(Of TKey, TActiveRecord)
-        Return Core.Reader.ToDictionary(Of TKey, TActiveRecord)(Me.Reader, keyColumnName, throwExceptionInDuplicateKey)
+    Public Function ToDictionary(Of TKey, TActiveRecord)(Optional databaseKeyColumnName As String = "", Optional throwExceptionInDuplicateKey As Boolean = True) As Dictionary(Of TKey, TActiveRecord)
+        Return ActiveRecord.Entity.ToDictionary(Of TKey, TActiveRecord)(Me.Reader, databaseKeyColumnName, throwExceptionInDuplicateKey)
     End Function
     ''' <summary>
     ''' Create new Dictionary with keys by first generic type and instances (values) by second generic type 
@@ -283,10 +276,9 @@ Public MustInherit Class Statement
     ''' <typeparam name="TActiveRecord">Result dictionary generic type to complete dictionary values.</typeparam>
     ''' <param name="keySelector">Anonymous function accepting first argument as TActiveRecord instance and returning it's specific field/property value to complete Dictionary key.</param>
     ''' <param name="throwExceptionInDuplicateKey">True to thrown Exception if any previous key will be founded by filling the result, false to overwrite any previous value.</param>
-    ''' <param name="closeReaderAfterSetUp">Automaticly close reader after all.</param>
     ''' <returns>Dictionary with keys completed by second anonymous function, values completed by reader columns with the same names as TActiveRecord type fields/properties.</returns>
-    Public Function ToDictionary(Of TKey, TActiveRecord)(keySelector As Func(Of TActiveRecord, TKey), Optional throwExceptionInDuplicateKey As Boolean = True, Optional closeReaderAfterSetUp As Boolean = True) As Dictionary(Of TKey, TActiveRecord)
-        Return Core.Reader.ToDictionary(Of TKey, TActiveRecord)(Me.Reader, keySelector, throwExceptionInDuplicateKey)
+    Public Function ToDictionary(Of TKey, TActiveRecord)(keySelector As Func(Of TActiveRecord, TKey), Optional throwExceptionInDuplicateKey As Boolean = True) As Dictionary(Of TKey, TActiveRecord)
+        Return ActiveRecord.Entity.ToDictionary(Of TKey, TActiveRecord)(Me.Reader, keySelector, throwExceptionInDuplicateKey)
     End Function
 
 

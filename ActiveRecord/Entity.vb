@@ -1,10 +1,11 @@
 ﻿Imports System.Dynamic
 Imports System.Reflection
 Imports System.Runtime.CompilerServices
+Imports System.Linq
 Imports Databasic
+Imports Databasic.ActiveRecord
 
 Namespace ActiveRecord
-
     ''' <summary>
     ''' Active record base class for database models.
     ''' All properties and fields in class extended from this class should be 
@@ -12,55 +13,27 @@ Namespace ActiveRecord
     ''' Choose fields and properties types to fit into database types.
     ''' </summary>
     <DefaultMember("Item")>
-    Public MustInherit Class Entity
+    Partial Public MustInherit Class Entity
         Inherits DynamicObject
 
-        Private Structure TouchedInfo
-            Public Value As Object
-            Public Type As Type
-        End Structure
 
 
 
         ''' <summary>
         ''' 
         ''' </summary>
-        <CompilerGenerated>
-        Protected connectionIndex As Int16 = Database.DEFAUT_CONNECTION_INDEX
-        ''' <summary>
-        ''' 
-        ''' </summary>
-        <CompilerGenerated>
-        Protected connectionName As String = Database.DEFAUT_CONNECTION_NAME
-        ''' <summary>
-        ''' ActiveRecord class database table name(s), first table is primary table.
-        ''' </summary>
-        <CompilerGenerated>
-        Protected tableNames As String() = New String() {}
-        ''' <summary>
-        ''' ActiveRecord class primary database table unique column name, usually "Id".
-        ''' </summary>
-        <CompilerGenerated>
-        Protected uniqueColumnName As String = "Id"
-        ''' <summary>
-        ''' 
-        ''' </summary>
-        <CompilerGenerated>
-        Protected Shared resource As Resource = New Resource()
+        Public Property Resource As Resource
 
 
 
 
-        ''' <summary>
-        ''' Active record model Id
-        ''' </summary>
-        <CompilerGenerated>
-        Public Property Id As Object
+
+
         ''' <summary>
         ''' Internal switch for setuping values by methods .ToXxxxx() to not fill touched dictionary.
         ''' </summary>
         <CompilerGenerated>
-        Friend InitialSetUp As Boolean = False
+        Private _initialSetUp As Boolean = False
         ''' <summary>
         ''' Properties with values and fields with values touched by indexer.
         ''' </summary>
@@ -80,6 +53,14 @@ Namespace ActiveRecord
         ''' Empty constructor to create ActiveRecord instances by Activator.CreateInstance(typeof(TActiveRecord))
         ''' </summary>
         Public Sub New()
+            Dim meType As Type = Me.GetType()
+            Dim pi As PropertyInfo = meType.GetProperty("Resource", BindingFlags.Instance Or BindingFlags.Public Or BindingFlags.NonPublic)
+            Dim fi As FieldInfo = meType.GetField("Resource", BindingFlags.Instance Or BindingFlags.Public Or BindingFlags.NonPublic)
+            If TypeOf pi Is Reflection.PropertyInfo Then
+                If pi.GetValue(Me, Nothing) = Nothing AndAlso pi.CanWrite Then pi.SetValue(Me, Resource.GetInstance(pi.PropertyType), Nothing)
+            ElseIf TypeOf fi Is Reflection.FieldInfo Then
+                If fi.GetValue(Me) = Nothing Then fi.SetValue(Me, Resource.GetInstance(fi.FieldType))
+            End If
         End Sub
 
 
@@ -107,10 +88,10 @@ Namespace ActiveRecord
         Public Function [get](ByVal key As String) As Object
             Dim type As Type = Me.GetType()
             Dim runtimeProperty As PropertyInfo = (
-            From prop In type.GetProperties(BindingFlags.Instance Or BindingFlags.Public Or BindingFlags.NonPublic)
-            Where prop.Name = key
-            Select prop
-        ).FirstOrDefault()
+                From prop In type.GetProperties(BindingFlags.Instance Or BindingFlags.Public Or BindingFlags.NonPublic)
+                Where prop.Name = key
+                Select prop
+            ).FirstOrDefault()
             If TypeOf runtimeProperty Is PropertyInfo AndAlso runtimeProperty.CanRead Then
                 Return runtimeProperty.GetValue(Me, Nothing)
             Else
@@ -153,7 +134,7 @@ Namespace ActiveRecord
                     Me._reserveStore.Item(key) = value
                 End If
             End If
-            If Me.InitialSetUp Then
+            If Me._initialSetUp Then
                 If Me._initialData.ContainsKey(key) Then
                     Me._initialData(key) = value
                 Else
@@ -218,15 +199,15 @@ Namespace ActiveRecord
                 rawValue = rawValue.ToString.Trim(New Char() {" "c, ChrW(13), ChrW(10), ChrW(9), ChrW(11)})
             End If
             Dim finalType As Type = If(
-            Nullable.GetUnderlyingType(propertyInfo.PropertyType) <> Nothing,
-            Nullable.GetUnderlyingType(propertyInfo.PropertyType),
-            propertyInfo.PropertyType
-        )
+                Nullable.GetUnderlyingType(propertyInfo.PropertyType) <> Nothing,
+                Nullable.GetUnderlyingType(propertyInfo.PropertyType),
+                propertyInfo.PropertyType
+            )
             Dim finalValue As Object = If(
-            TypeOf rawValue Is DBNull,
-            Nothing,
-            Convert.ChangeType(rawValue, finalType)
-        )
+                TypeOf rawValue Is DBNull,
+                Nothing,
+                Convert.ChangeType(rawValue, finalType)
+            )
             propertyInfo.SetValue(Me, finalValue, Nothing)
         End Sub
 
@@ -247,14 +228,14 @@ Namespace ActiveRecord
         ''' <param name="asInitialData">True to fill data into initial Dictionary to compare them later by GetTouched() function.</param>
         Public Sub SetUp(data As Dictionary(Of String, Object), Optional asInitialData As Boolean = False)
             If asInitialData Then
-                Me.InitialSetUp = True
+                Me._initialSetUp = True
             End If
             Dim pair As KeyValuePair(Of String, Object)
             For Each pair In data
                 Me.[set](pair.Key, pair.Value)
             Next
             If asInitialData Then
-                Me.InitialSetUp = False
+                Me._initialSetUp = False
             End If
         End Sub
 
@@ -281,18 +262,18 @@ Namespace ActiveRecord
             Dim initialType As Type
             Dim currentType As Type
             Dim instanceType As Type = Me.GetType()
-            Dim indexerPropertyName = Entity._getIndexerPropertyName(instanceType)
+            Dim indexerPropertyName = MetaDescriptor.GetIndexerPropertyName(instanceType)
             Dim protectedElements As New List(Of String) From {
                 "InitialSetUp", "_initialData", "_reserveStore", "tableNames", "connectionIndex", "connectionName", "uniqueColumnName"
             }
-            Dim definedAndCurrent As New Dictionary(Of String, TouchedInfo)
+            Dim definedAndCurrent As New Dictionary(Of String, Databasic.MemberInfo)
             For Each prop As PropertyInfo In instanceType.GetProperties(BindingFlags.Instance Or BindingFlags.Public Or BindingFlags.NonPublic)
                 If (
                     Not definedAndCurrent.ContainsKey(prop.Name) And
                     prop.Name <> indexerPropertyName And
                     Not protectedElements.Contains(prop.Name)
                 ) Then
-                    definedAndCurrent.Add(prop.Name, New TouchedInfo() With {
+                    definedAndCurrent.Add(prop.Name, New Databasic.MemberInfo() With {
                         .Value = prop.GetValue(Me, Nothing),
                         .Type = prop.PropertyType
                     })
@@ -302,15 +283,15 @@ Namespace ActiveRecord
                 If (
                     Not definedAndCurrent.ContainsKey(field.Name) And
                     Not protectedElements.Contains(field.Name) And
-                    Not Entity._isCompilerGenerated(field)
+                    Not MetaDescriptor.IsCompilerGenerated(field)
                 ) Then
-                    definedAndCurrent.Add(field.Name, New TouchedInfo() With {
+                    definedAndCurrent.Add(field.Name, New Databasic.MemberInfo() With {
                         .Value = field.GetValue(Me),
                         .Type = field.FieldType
                     })
                 End If
             Next
-            For Each current As KeyValuePair(Of String, TouchedInfo) In definedAndCurrent
+            For Each current As KeyValuePair(Of String, Databasic.MemberInfo) In definedAndCurrent
                 initialValue = Nothing
                 currentValue = current.Value.Value
                 If Me._initialData.ContainsKey(current.Key) Then
@@ -343,15 +324,6 @@ Namespace ActiveRecord
             Next
             Return touched
         End Function
-        Private Shared Function _getIndexerPropertyName(Type As Type) As String
-            Dim defaultAttr As Attribute = Attribute.GetCustomAttribute(Type, GetType(DefaultMemberAttribute))
-            Return If(TypeOf defaultAttr Is DefaultMemberAttribute, DirectCast(defaultAttr, DefaultMemberAttribute).MemberName, "")
-        End Function
-
-        Private Shared Function _isCompilerGenerated(fieldInfo As MemberInfo) As Boolean
-            Dim compilerGeneratedAttr As Attribute = Attribute.GetCustomAttribute(fieldInfo, GetType(CompilerGeneratedAttribute))
-            Return TypeOf compilerGeneratedAttr Is CompilerGeneratedAttribute
-        End Function
 
 
 
@@ -362,7 +334,7 @@ Namespace ActiveRecord
         ''' </summary>
         ''' <param name="connectionIndex">Config connection index to use different database, default by 0 to use first connection in &lt;connectionStrings&gt; list.</param>
         ''' <returns></returns>
-        Public Function Save(Optional connectionIndex As Int16 = Database.DEFAUT_CONNECTION_INDEX) As Int32
+        Public Function Save(Optional connectionIndex As Int32 = Database.DEFAUT_CONNECTION_INDEX) As Int32
             Return Me.Save(Connection.Get(connectionIndex))
         End Function
         ''' <summary>
@@ -391,7 +363,7 @@ Namespace ActiveRecord
         ''' </summary>
         ''' <param name="connectionIndex">Config connection index to use different database, default by 0 to use first connection in &lt;connectionStrings&gt; list.</param>
         ''' <returns></returns>
-        Public Function Delete(Optional connectionIndex As Int16 = Database.DEFAUT_CONNECTION_INDEX) As Int32
+        Public Function Delete(Optional connectionIndex As Int32 = Database.DEFAUT_CONNECTION_INDEX) As Int32
             Return Me.Delete(Connection.Get(connectionIndex))
         End Function
         ''' <summary>
@@ -411,22 +383,22 @@ Namespace ActiveRecord
 
 
 
-        Public Shared Function Columns(activeRecordType As Type, tableIndex As Int16, Optional separator As String = ",") As String
+        Public Shared Function Columns(activeRecordType As Type, tableIndex As Int32, Optional separator As String = ",") As String
             Return String.Join(separator, Resource.Columns(activeRecordType, tableIndex).ToArray())
         End Function
-        Public Shared Function Columns(activeRecordType As Type, Optional separator As String = ",", Optional tableIndex As Int16 = 0) As String
+        Public Shared Function Columns(activeRecordType As Type, Optional separator As String = ",", Optional tableIndex As Int32 = 0) As String
             Return String.Join(separator, Resource.Columns(activeRecordType, tableIndex))
         End Function
-        Public Shared Function Columns(Of TActiveRecord)(tableIndex As Int16, Optional separator As String = ",") As String
+        Public Shared Function Columns(Of TActiveRecord)(tableIndex As Int32, Optional separator As String = ",") As String
             Return String.Join(separator, Resource.Columns(GetType(TActiveRecord), tableIndex))
         End Function
-        Public Shared Function Columns(Of TActiveRecord)(Optional separator As String = ",", Optional tableIndex As Int16 = 0) As String
+        Public Shared Function Columns(Of TActiveRecord)(Optional separator As String = ",", Optional tableIndex As Int32 = 0) As String
             Return String.Join(separator, Resource.Columns(GetType(TActiveRecord), tableIndex))
         End Function
-        Public Function Columns(tableIndex As Int16, Optional separator As String = ",") As String
+        Public Function Columns(tableIndex As Int32, Optional separator As String = ",") As String
             Return String.Join(separator, Resource.Columns(Me.GetType(), tableIndex))
         End Function
-        Public Function Columns(Optional separator As String = ",", Optional tableIndex As Int16 = 0) As String
+        Public Function Columns(Optional separator As String = ",", Optional tableIndex As Int32 = 0) As String
             Return String.Join(separator, Resource.Columns(Me.GetType(), tableIndex))
         End Function
 
@@ -438,7 +410,7 @@ Namespace ActiveRecord
         ''' <param name="activeRecordType">Class type, inherited from ActiveRecord class with declared protected static field 'tables' as array of strings.</param>
         ''' <param name="tableIndex">Array index to get proper table name string from declared protected static field 'tables' as array of strings.</param>
         ''' <returns>Declared database table name from active record class.</returns>
-        Public Shared Function TableName(activeRecordType As Type, Optional tableIndex As Int16 = 0) As String
+        Public Shared Function TableName(activeRecordType As Type, Optional tableIndex As Int32 = 0) As String
             Return Resource.Table(activeRecordType, tableIndex)
         End Function
         ''' <summary>
@@ -447,10 +419,10 @@ Namespace ActiveRecord
         ''' <typeparam name="TActiveRecord">Class name, inherited from ActiveRecord class with declared protected static field 'tables' as array of strings.</typeparam>
         ''' <param name="tableIndex">Array index to get proper table name string from declared protected static field 'tables' as array of strings.</param>
         ''' <returns>Declared database table name from active record class.</returns>
-        Public Shared Function TableName(Of TActiveRecord)(Optional tableIndex As Int16 = 0) As String
+        Public Shared Function TableName(Of TActiveRecord)(Optional tableIndex As Int32 = 0) As String
             Return Resource.Table(GetType(TActiveRecord), tableIndex)
         End Function
-        Public Function TableName(Optional tableIndex As Int16 = 0) As String
+        Public Function TableName(Optional tableIndex As Int32 = 0) As String
             Return Resource.Table(Me.GetType(), tableIndex)
         End Function
 

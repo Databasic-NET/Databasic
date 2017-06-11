@@ -5,7 +5,7 @@ Imports Databasic.ActiveRecord
 Imports Databasic
 
 Public Class Database
-    Public Const DEFAUT_CONNECTION_INDEX As Int16 = 0
+    Public Const DEFAUT_CONNECTION_INDEX As Int32 = 0
     Public Const DEFAUT_CONNECTION_NAME As String = "DefaultConnection"
     Public Const DEFAUT_UNIQUE_COLUMN_NAME As String = "Id"
 
@@ -21,7 +21,7 @@ Public Class Database
     ''' <param name="uniqueColumnValue">Id column value.</param>
     ''' <param name="connectionIndex">Config connection index to use different database, default by 0 to use first connection in &lt;connectionStrings&gt; list.</param>
     ''' <returns></returns>
-    Public Shared Function GetById(Of TValue)(uniqueColumnValue As Object, Optional connectionIndex As Int16 = Database.DEFAUT_CONNECTION_INDEX) As TValue
+    Public Shared Function GetById(Of TValue)(uniqueColumnValue As Object, Optional connectionIndex As Int32 = Database.DEFAUT_CONNECTION_INDEX) As TValue
         Return Database.GetById(Of TValue)(
             uniqueColumnValue, Connection.Get(connectionIndex)
         )
@@ -66,7 +66,7 @@ Public Class Database
 
 
     Public Shared Function GetAll(Of TValue)(
-        Optional offset As Int64? = Nothing, Optional limit As Int64? = Nothing, Optional orderByStatement As String = Database.DEFAUT_UNIQUE_COLUMN_NAME, Optional connectionIndex As Int16 = Database.DEFAUT_CONNECTION_INDEX
+        Optional offset As Int64? = Nothing, Optional limit As Int64? = Nothing, Optional orderByStatement As String = Database.DEFAUT_UNIQUE_COLUMN_NAME, Optional connectionIndex As Int32 = Database.DEFAUT_CONNECTION_INDEX
     ) As List(Of TValue)
         Return Database.GetAll(Of TValue)(
             offset, limit, orderByStatement, Databasic.Connection.Get(connectionIndex)
@@ -99,7 +99,7 @@ Public Class Database
         Optional limit As Int64? = Nothing,
         Optional keyColumnName As String = Database.DEFAUT_UNIQUE_COLUMN_NAME,
         Optional orderByStatement As String = Database.DEFAUT_UNIQUE_COLUMN_NAME,
-        Optional connectionIndex As Int16 = Database.DEFAUT_CONNECTION_INDEX
+        Optional connectionIndex As Int32 = Database.DEFAUT_CONNECTION_INDEX
     ) As Dictionary(Of TKey, TValue)
         Dim connection As Connection = Databasic.Connection.Get(connectionIndex)
         Return Database.GetAll(Of TKey, TValue)(
@@ -136,7 +136,7 @@ Public Class Database
         ).ToDictionary(Of TKey, TValue)(keyColumnName)
     End Function
 
-    Public Shared Function GetCount(Of TValue)(Optional connectionIndex As Int16 = Database.DEFAUT_CONNECTION_INDEX) As Int64
+    Public Shared Function GetCount(Of TValue)(Optional connectionIndex As Int32 = Database.DEFAUT_CONNECTION_INDEX) As Int64
         Return Database.GetCount(Of TValue)(Databasic.Connection.Get(connectionIndex))
     End Function
     Public Shared Function GetCount(Of TValue)(connectionName As String) As Int64

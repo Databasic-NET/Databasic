@@ -39,7 +39,7 @@
 
 
         Public Overridable Function GetCount(connection As Databasic.Connection, table As String, Optional countColumn As String = "*") As Int64
-            Return Databasic.Statement.Prepare($"SELECT COUNT({countColumn}) FROM  {table}", connection).FetchAll().ToValue(Of Int64)()
+            Return Databasic.Statement.Prepare($"SELECT COUNT({countColumn}) FROM  {table}", connection).FetchAll().ToInstance(Of Int64)()
         End Function
 
 

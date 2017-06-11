@@ -18,7 +18,7 @@ Partial Public MustInherit Class Connection
     ''' <param name="transactionName">Transaction name.</param>
     ''' <param name="isolationLevel">Transaction isolation level.</param>
     ''' <returns>New transaction.</returns>
-    Public Shared Function BeginTransaction(connectionIndex As Int16, Optional transactionName As String = "", Optional isolationLevel As IsolationLevel = IsolationLevel.Unspecified) As Transaction
+    Public Shared Function BeginTransaction(connectionIndex As Int32, Optional transactionName As String = "", Optional isolationLevel As IsolationLevel = IsolationLevel.Unspecified) As Transaction
         Return Databasic.Connection.Get(connectionIndex).CreateAndBeginTransaction(transactionName, isolationLevel)
     End Function
     ''' <summary>
