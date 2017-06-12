@@ -153,28 +153,28 @@ Partial Public MustInherit Class Connection
         Dim keyBegin As String = processId.ToString() + "_"
         Dim key As String
         Dim conns As Dictionary(Of Int32, Connection)
-        Dim provider As DbConnection
-        Using Connection._registerLock.WriteLock()
-            For i As Int32 = Connection._connectionsRegister.Keys.Count - 1 To 0 Step -1
-                If Connection._connectionsRegister.Keys.Contains(i) Then
-                    key = Connection._connectionsRegister.Keys(i)
-                Else
-                    Continue For
-                End If
-                If key.IndexOf(keyBegin) = 0 Then
-                    conns = Connection._connectionsRegister(key)
-                    For Each item In conns
-                        provider = item.Value.Provider
-                        If provider.State = ConnectionState.Open Then
-                            provider.Close()
-                            provider.Dispose()
-                        End If
-                    Next
-                    Connection._connectionsRegister.Remove(key)
-                    Connection._registerLocks.Remove(key)
-                End If
-            Next
-        End Using
-    End Sub
+		Dim provider As DbConnection
+		Connection._registerLock.EnterWriteLock()
+		For i As Int32 = Connection._connectionsRegister.Keys.Count - 1 To 0 Step -1
+			If Connection._connectionsRegister.Keys.Contains(i) Then
+				key = Connection._connectionsRegister.Keys(i)
+			Else
+				Continue For
+			End If
+			If key.IndexOf(keyBegin) = 0 Then
+				conns = Connection._connectionsRegister(key)
+				For Each item In conns
+					provider = item.Value.Provider
+					If provider.State = ConnectionState.Open Then
+						provider.Close()
+						provider.Dispose()
+					End If
+				Next
+				Connection._connectionsRegister.Remove(key)
+				Connection._registerLocks.Remove(key)
+			End If
+		Next
+		Connection._registerLock.ExitWriteLock()
+	End Sub
 
 End Class

@@ -13,15 +13,14 @@ Public Class Database
 
 
 
-
-    ''' <summary>
-    ''' Get active record entity instance by unique column, all table columns will be loaded by * SQL operator if no columns defined.
-    ''' </summary>
-    ''' <typeparam name="TValue">Model class type, inherited from ActiveRecord.</typeparam>
-    ''' <param name="uniqueColumnValue">Id column value.</param>
-    ''' <param name="connectionIndex">Config connection index to use different database, default by 0 to use first connection in &lt;connectionStrings&gt; list.</param>
-    ''' <returns></returns>
-    Public Shared Function GetById(Of TValue)(uniqueColumnValue As Object, Optional connectionIndex As Int32 = Database.DEFAUT_CONNECTION_INDEX) As TValue
+	''' <summary>
+	''' Get active record entity instance by unique column, all table columns will be loaded by * SQL operator if no columns defined.
+	''' </summary>
+	''' <typeparam name="TValue">Model class type, inherited from ActiveRecord.</typeparam>
+	''' <param name="uniqueColumnValue">Id column value.</param>
+	''' <param name="connectionIndex">Config connection index to use different database, default by 0 to use first connection in &lt;connectionStrings&gt; list.</param>
+	''' <returns></returns>
+	Public Shared Function GetById(Of TValue)(uniqueColumnValue As Object, Optional connectionIndex As Int32 = Database.DEFAUT_CONNECTION_INDEX) As TValue
         Return Database.GetById(Of TValue)(
             uniqueColumnValue, Connection.Get(connectionIndex)
         )

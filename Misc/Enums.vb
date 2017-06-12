@@ -31,7 +31,7 @@ Public Enum DuplicateKeyBehaviour
     OverwriteByNewValue
 End Enum
 
-Public Enum MemberInfoType
-    Prop
-    Field
+Friend Enum MemberInfoType
+	Prop
+	Field
 End Enum

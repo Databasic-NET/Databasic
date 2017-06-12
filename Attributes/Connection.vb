@@ -1,7 +1,7 @@
 ﻿Public Class ConnectionAttribute
     Inherits Attribute
-    Friend ConnectionIndex As Int32 = Database.DEFAUT_CONNECTION_INDEX
-    Public Sub New(configConnectionName As String)
+	Public ConnectionIndex As Int32 = Database.DEFAUT_CONNECTION_INDEX
+	Public Sub New(configConnectionName As String)
         If Not String.IsNullOrEmpty(configConnectionName) Then
             Me.ConnectionIndex = Connection.GetIndexByName(configConnectionName)
         End If

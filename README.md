@@ -12,23 +12,25 @@ Install this package only with specific database package like:
 // TODO:
 ## Basic Examples
 ```vb
-' create active record class extending DbSharp.Model:
+Imports Databasic
+
+' create active record class extending Databasic.ActiveRecord.Entity:
 Public Class Dealer
-    Inherits DbSharp.Model
+    Inherits ActiveRecord.Entity
     Public Id As Int32?
     Public Property Firstname As String
     Public Property Secondname As String
 End Class
 
 ' load dealer with id 5 and create it's instance:
-Dim instance As Dealer = Command.Prepare(
+Dim instance As Dealer = Statement.Prepare(
     "SELECT * FROM Dealers WHERE Id = @id"
 ).FetchOne(New With {
     .id = 5
 }).ToInstance(Of Dealer)()
 
 ' load all dealers with id higher than 5 into list
-Dim list As List(Of Dealer) = Command.Prepare(
+Dim list As List(Of Dealer) = Statement.Prepare(
     "SELECT * FROM Dealers WHERE Id > @id"
 ).FetchAll(New With {
     .id = 5
@@ -36,7 +38,7 @@ Dim list As List(Of Dealer) = Command.Prepare(
 
 ' load all dealers with id higher than 5 into dictionary
 ' and complete dictionary keys by Id column
-Dim dct As Dictionary(Of Int32, Dealer) = Command.Prepare(
+Dim dct As Dictionary(Of Int32, Dealer) = Statement.Prepare(
     "SELECT * FROM Dealers WHERE Id > @id"
 ).FetchAll(New With {
     .id = 5
@@ -44,22 +46,24 @@ Dim dct As Dictionary(Of Int32, Dealer) = Command.Prepare(
 ```
 
 ```cs
-// create active record class extending DbSharp.Model:
-public class Dealer: DbSharp.Model {
+using Databasic;
+
+// create active record class extending Databasic.ActiveRecord.Entity:
+public class Dealer: ActiveRecord.Entity {
     public int? Id;
     public string Firstname { get; set; }
     public string Secondname { get; set; }
 }
 
 // load dealer with id 5 and create it's instance:
-Dealer instance = Command.Prepare(
+Dealer instance = Statement.Prepare(
     "SELECT * FROM Dealers WHERE Id = @id"
 ).FetchOne(new {
     id = 5
 }).ToInstance<Dealer>()
 
 // load all dealers with id higher than 5 into list
-List<Dealer> list = Command.Prepare(
+List<Dealer> list = Statement.Prepare(
     "SELECT * FROM Dealers WHERE Id > @id"
 ).FetchAll(new {
     id = 5
@@ -67,16 +71,17 @@ List<Dealer> list = Command.Prepare(
 
 // load all dealers with id higher than 5 into dictionary
 // and complete dictionary keys by Id column
-Dictionary<Int32, Dealer> dct = Command.Prepare(
+Dictionary<Int32, Dealer> dct = Statement.Prepare(
     "SELECT * FROM Dealers WHERE Id > @id"
 ).FetchAll(new {
     id = 5
 }).ToDictionary<Int32, Dealer>("Id")
 ```
 
+
 ## Features
-- choosing connection by config index or name as another param of Command.Prepare()
-- passing transactions as second param of Command.Prepare()
+- choosing connection by config index or name as another param of Databasic.Statement.Prepare()
+- passing transactions as second param of Databasic.Statement.Prepare()
 - any non-select SQL statements
 - Microsoft SQL Server and MySQL server support
 - selection single value (for example counts etc...)

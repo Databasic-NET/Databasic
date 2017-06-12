@@ -8,9 +8,9 @@ Partial Public MustInherit Class Connection
     ''' <param name="transactionName">Transaction name.</param>
     ''' <param name="isolationLevel">Transaction isolation level.</param>
     ''' <returns>New transaction.</returns>
-    Public Shared Function BeginTransaction(Optional transactionName As String = "", Optional isolationLevel As IsolationLevel = IsolationLevel.Unspecified) As Transaction
-        Return Databasic.Connection.BeginTransaction(Database.DEFAUT_CONNECTION_INDEX, transactionName, isolationLevel)
-    End Function
+    Public Function BeginTransaction(Optional transactionName As String = "", Optional isolationLevel As IsolationLevel = IsolationLevel.Unspecified) As Transaction
+		Return Me.BeginTransaction(Tools.GetConnectionIndexByClassAttr(Tools.GetEntryClassType()), transactionName, isolationLevel)
+	End Function
     ''' <summary>
     ''' Create and begin transaction on specified connection config index.
     ''' </summary>
@@ -18,7 +18,7 @@ Partial Public MustInherit Class Connection
     ''' <param name="transactionName">Transaction name.</param>
     ''' <param name="isolationLevel">Transaction isolation level.</param>
     ''' <returns>New transaction.</returns>
-    Public Shared Function BeginTransaction(connectionIndex As Int32, Optional transactionName As String = "", Optional isolationLevel As IsolationLevel = IsolationLevel.Unspecified) As Transaction
+    Public Function BeginTransaction(connectionIndex As Int32, Optional transactionName As String = "", Optional isolationLevel As IsolationLevel = IsolationLevel.Unspecified) As Transaction
         Return Databasic.Connection.Get(connectionIndex).CreateAndBeginTransaction(transactionName, isolationLevel)
     End Function
     ''' <summary>
@@ -28,7 +28,7 @@ Partial Public MustInherit Class Connection
     ''' <param name="transactionName">Transaction name.</param>
     ''' <param name="isolationLevel">Transaction isolation level.</param>
     ''' <returns>New transaction.</returns>
-    Public Shared Function BeginTransaction(connectionName As String, Optional transactionName As String = "", Optional isolationLevel As IsolationLevel = IsolationLevel.Unspecified) As Transaction
+    Public Function BeginTransaction(connectionName As String, Optional transactionName As String = "", Optional isolationLevel As IsolationLevel = IsolationLevel.Unspecified) As Transaction
         Return Databasic.Connection.Get(connectionName).CreateAndBeginTransaction(transactionName, isolationLevel)
     End Function
 

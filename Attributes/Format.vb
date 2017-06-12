@@ -2,8 +2,8 @@
 
 Public Class FormatAttribute
     Inherits Attribute
-    Friend FormatProvider As IFormatProvider = CultureInfo.CurrentCulture
-    Public Sub New(formatProvider As IFormatProvider)
+	Public FormatProvider As IFormatProvider = CultureInfo.CurrentCulture
+	Public Sub New(formatProvider As IFormatProvider)
         Me.FormatProvider = formatProvider
     End Sub
     Public Sub New(cultureInfoName As String)

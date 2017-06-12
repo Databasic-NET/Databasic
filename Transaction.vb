@@ -3,13 +3,13 @@
 Public MustInherit Class Transaction
     Inherits DbTransaction
 
-    Public Overrides ReadOnly Property IsolationLevel() As Data.IsolationLevel
-        Get
-            Return Me.Instance.IsolationLevel
-        End Get
-    End Property
+	Public Overrides ReadOnly Property IsolationLevel As Data.IsolationLevel
+		Get
+			Return Me.Instance.IsolationLevel
+		End Get
+	End Property
 
-    Public Shadows ReadOnly Property Connection As DbConnection
+	Public Shadows ReadOnly Property Connection As DbConnection
         Get
             Return Me.ConnectionWrapper.Provider
         End Get

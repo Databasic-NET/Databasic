@@ -26,43 +26,52 @@ Public Class MetaDescriptor
         Return TypeOf compilerGeneratedAttr Is CompilerGeneratedAttribute
     End Function
 
-    Public Shared Function GetMetaDescription(type As Type) As MetaDescription
-        Dim result As MetaDescription
-        Dim key As String = type.Assembly.GetName().Name + ":" + type.FullName
-        MetaDescriptor._lock.EnterUpgradeableReadLock()
-        If MetaDescriptor._register.ContainsKey(key) Then
-            result = MetaDescriptor._register(key)
-            MetaDescriptor._lock.ExitUpgradeableReadLock()
-        Else
-            MetaDescriptor._lock.EnterWriteLock()
-            MetaDescriptor._lock.ExitUpgradeableReadLock()
-            result = MetaDescriptor._completeMetaDescription(type)
-            MetaDescriptor._register.Add(key, result)
-            MetaDescriptor._lock.ExitWriteLock()
-        End If
-        Return result
-    End Function
+	Friend Shared Function GetColumnByCodeName(type As Type, codeColumnName As String) As Databasic.MemberInfo?
+		Dim result As Databasic.MemberInfo? = Nothing
+		Dim members As Dictionary(Of String, Databasic.MemberInfo)
+		Dim meta As MetaDescription
+		Dim key As String = type.Assembly.GetName().Name + ":" + type.FullName
+		MetaDescriptor._lock.EnterUpgradeableReadLock()
+		If MetaDescriptor._register.ContainsKey(key) Then
+			members = MetaDescriptor._register(key).ColumnsByCodeNames
+			If members.ContainsKey(codeColumnName) Then
+				result = members(codeColumnName)
+			End If
+			MetaDescriptor._lock.ExitUpgradeableReadLock()
+		Else
+			MetaDescriptor._lock.EnterWriteLock()
+			MetaDescriptor._lock.ExitUpgradeableReadLock()
+			meta = MetaDescriptor._completeMetaDescription(type)
+			MetaDescriptor._register.Add(key, meta)
+			members = meta.ColumnsByCodeNames
+			If members.ContainsKey(codeColumnName) Then
+				result = members(codeColumnName)
+			End If
+			MetaDescriptor._lock.ExitWriteLock()
+		End If
+		Return result
+	End Function
 
-    Public Shared Function GetColumnsByDbNames(Type As Type) As Dictionary(Of String, Databasic.MemberInfo)
-        Dim result As Dictionary(Of String, Databasic.MemberInfo)
-        Dim meta As MetaDescription
-        Dim key As String = Type.Assembly.GetName().Name + ":" + Type.FullName
-        MetaDescriptor._lock.EnterUpgradeableReadLock()
-        If MetaDescriptor._register.ContainsKey(key) Then
-            result = MetaDescriptor._register(key).ColumnsByDbNames
-            MetaDescriptor._lock.ExitUpgradeableReadLock()
-        Else
-            MetaDescriptor._lock.EnterWriteLock()
-            MetaDescriptor._lock.ExitUpgradeableReadLock()
-            meta = MetaDescriptor._completeMetaDescription(Type)
-            MetaDescriptor._register.Add(key, meta)
-            result = meta.ColumnsByDbNames
-            MetaDescriptor._lock.ExitWriteLock()
-        End If
-        Return result
-    End Function
+	Friend Shared Function GetColumnsByDbNames(type As Type) As Dictionary(Of String, Databasic.MemberInfo)
+		Dim result As Dictionary(Of String, Databasic.MemberInfo)
+		Dim meta As MetaDescription
+		Dim key As String = type.Assembly.GetName().Name + ":" + type.FullName
+		MetaDescriptor._lock.EnterUpgradeableReadLock()
+		If MetaDescriptor._register.ContainsKey(key) Then
+			result = MetaDescriptor._register(key).ColumnsByDbNames
+			MetaDescriptor._lock.ExitUpgradeableReadLock()
+		Else
+			MetaDescriptor._lock.EnterWriteLock()
+			MetaDescriptor._lock.ExitUpgradeableReadLock()
+			meta = MetaDescriptor._completeMetaDescription(type)
+			MetaDescriptor._register.Add(key, meta)
+			result = meta.ColumnsByDbNames
+			MetaDescriptor._lock.ExitWriteLock()
+		End If
+		Return result
+	End Function
 
-    Private Shared Function _completeMetaDescription(type As Type) As MetaDescription
+	Private Shared Function _completeMetaDescription(type As Type) As MetaDescription
         Dim connectionAttr As ConnectionAttribute = DirectCast(Attribute.GetCustomAttribute(type, MetaDescriptor.ConnectionAttrType), ConnectionAttribute)
         Dim tableAttr As TableAttribute = DirectCast(Attribute.GetCustomAttribute(type, MetaDescriptor.TableAttrType), TableAttribute)
         Dim result As New MetaDescription With {
@@ -121,8 +130,8 @@ Public Class MetaDescriptor
         Dim keyName As String
         Dim primaryKeyAttr As PrimaryKeyAttribute
         Dim uniqueKeyAttr As UniqueKeyAttribute
-        Dim reflMemberInfo As Reflection.MemberInfo
-        result.ColumnsByCodeNames = New Dictionary(Of String, Databasic.MemberInfo)
+		Dim reflMemberInfo As Reflection.MemberInfo
+		result.ColumnsByCodeNames = New Dictionary(Of String, Databasic.MemberInfo)
         result.ColumnsByDbNames = New Dictionary(Of String, Databasic.MemberInfo)
         result.PrimaryColumnsByCodeNames = New Dictionary(Of String, List(Of String))
         result.PrimaryColumnsByDbNames = New Dictionary(Of String, List(Of String))
@@ -196,3 +205,4 @@ Public Class MetaDescriptor
     End Sub
 
 End Class
+

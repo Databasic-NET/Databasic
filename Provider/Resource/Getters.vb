@@ -23,10 +23,10 @@
             Optional uniqueColumnName As String = Database.DEFAUT_UNIQUE_COLUMN_NAME,
             Optional uniqueColumnValue As Object = Nothing
         ) As Statement
-            Return Databasic.Statement.Prepare(
-                $"SELECT {columns} FROM {table} WHERE {uniqueColumnName} = @uniqueParamValue", connection
-            ).FetchAll(New With {.uniqueParamValue = uniqueColumnValue})
-        End Function
+			Return Databasic.Statement.Prepare(
+				$"SELECT {columns} FROM {table} WHERE {uniqueColumnName} = @uniqueParamValue", connection
+			).FetchAll(New With {.uniqueParamValue = uniqueColumnValue})
+		End Function
 
 
         Public Overridable Function GetLastInsertedId(transaction As Databasic.Transaction) As Object
@@ -39,8 +39,8 @@
 
 
         Public Overridable Function GetCount(connection As Databasic.Connection, table As String, Optional countColumn As String = "*") As Int64
-            Return Databasic.Statement.Prepare($"SELECT COUNT({countColumn}) FROM  {table}", connection).FetchAll().ToInstance(Of Int64)()
-        End Function
+			Return Databasic.Statement.Prepare($"SELECT COUNT({countColumn}) FROM  {table}", connection).FetchAll().ToInstance(Of Int64)()
+		End Function
 
 
 
