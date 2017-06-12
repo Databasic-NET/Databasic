@@ -15,69 +15,119 @@ Install this package only with specific database package like:
 Imports Databasic
 
 ' create active record class extending Databasic.ActiveRecord.Entity:
-Public Class Dealer
-    Inherits ActiveRecord.Entity
+<Connection("ConfigConnectionName")>
+Public Class Person
     Public Id As Int32?
     Public Property Firstname As String
     Public Property Secondname As String
 End Class
 
-' load dealer with id 5 and create it's instance:
-Dim instance As Dealer = Statement.Prepare(
-    "SELECT * FROM Dealers WHERE Id = @id"
+' load person with id 5 and create it's instance:
+Dim instance As Person = Statement.Prepare(
+    "SELECT * FROM Persons WHERE Id = @id"
 ).FetchOne(New With {
     .id = 5
-}).ToInstance(Of Dealer)()
+}).ToInstance(Of Person)()
 
-' load all dealers with id higher than 5 into list
-Dim list As List(Of Dealer) = Statement.Prepare(
-    "SELECT * FROM Dealers WHERE Id > @id"
+' load all persons with id higher than 5 into list
+Dim list As List(Of Person) = Statement.Prepare(
+    "SELECT * FROM Persons WHERE Id > @id"
 ).FetchAll(New With {
     .id = 5
-}).ToList(Of Dealer)()
+}).ToList(Of Person)()
 
-' load all dealers with id higher than 5 into dictionary
+' load all persons with id higher than 5 into dictionary
 ' and complete dictionary keys by Id column
-Dim dct As Dictionary(Of Int32, Dealer) = Statement.Prepare(
-    "SELECT * FROM Dealers WHERE Id > @id"
+Dim dct As Dictionary(Of Int32, Person) = Statement.Prepare(
+    "SELECT * FROM Persons WHERE Id > @id"
 ).FetchAll(New With {
     .id = 5
-}).ToDictionary(Of Int32, Dealer)("Id")
+}).ToDictionary(Of Int32, Person)("Id")
 ```
 
 ```cs
 using Databasic;
 
 // create active record class extending Databasic.ActiveRecord.Entity:
-public class Dealer: ActiveRecord.Entity {
+[Connection("ConfigConnectionName")]
+public class Person {
     public int? Id;
     public string Firstname { get; set; }
     public string Secondname { get; set; }
 }
 
-// load dealer with id 5 and create it's instance:
-Dealer instance = Statement.Prepare(
-    "SELECT * FROM Dealers WHERE Id = @id"
+// load person with id 5 and create it's instance:
+Person instance = Statement.Prepare(
+    "SELECT * FROM Persons WHERE Id = @id"
 ).FetchOne(new {
     id = 5
-}).ToInstance<Dealer>()
+}).ToInstance<Person>()
 
-// load all dealers with id higher than 5 into list
-List<Dealer> list = Statement.Prepare(
-    "SELECT * FROM Dealers WHERE Id > @id"
+// load all persons with id higher than 5 into list
+List<Person> list = Statement.Prepare(
+    "SELECT * FROM Persons WHERE Id > @id"
 ).FetchAll(new {
     id = 5
-}).ToList<Dealer>()
+}).ToList<Person>()
 
-// load all dealers with id higher than 5 into dictionary
+// load all persons with id higher than 5 into dictionary
 // and complete dictionary keys by Id column
-Dictionary<Int32, Dealer> dct = Statement.Prepare(
-    "SELECT * FROM Dealers WHERE Id > @id"
+Dictionary<Int32, Person> dct = Statement.Prepare(
+    "SELECT * FROM Persons WHERE Id > @id"
 ).FetchAll(new {
     id = 5
-}).ToDictionary<Int32, Dealer>("Id")
+}).ToDictionary<Int32, Person>("Id")
 ```
 
+## Advanced Examples
+```cs
+using Databasic;
+using System;
+using System.Collections.Generic;
+
+[Connection("DefaultConnection"),Table("Dealers")]
+class Dealer: Person {
+	public int? Id { get; set; }
+	[Column("Firstname"), Trim]
+	public new string FirstName { get; set; }
+	[Column("Secondname")]
+	public new string SecondName { get; set; }
+	public double? TurnOver { get; set; }
+
+	public static Dealer GetById (int id) {
+		return Statement.Prepare(
+			$"SELECT {Columns()} FROM {Table()} WHERE Id = @idParam"
+		).FetchOne(new {
+			idParam = id
+		}).ToInstance<Dealer>();
+	}
+	public static int GetCount () {
+		return Statement.Prepare(
+			$"SELECT COUNT(Id) FROM {Table()}"
+		).FetchOne().ToInstance<Int32>();
+	}
+	public static Dictionary<object, Dealer> GetDictionary (Func<Dealer, object> keySelector = null) {
+		return Statement.Prepare(
+			$"SELECT {Columns()} FROM {Table()}"
+		).FetchAll().ToDictionary<object, Dealer>(
+			keySelector ?? (d => d.Id.Value)
+		);
+	}
+	public static List<Dealer> GetList () {
+		return Statement.Prepare(
+			$"SELECT {Columns()} FROM {Table()}"
+		).FetchAll().ToList<Dealer>();
+	}
+}
+...
+Dictionary<object, Dealer> dct = Dealer.GetDictionary();
+
+List<Dealer> list = Dealer.GetList();
+
+Dealer dealer1 = Dealer.GetById(3);
+
+int cnt = Dealer.GetCount();
+```
 
 ## Features
 - choosing connection by config index or name as another param of Databasic.Statement.Prepare()
