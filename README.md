@@ -5,11 +5,19 @@
 - arranging data into primitive types, typed active record classes, collections and more
 - allowing to run any nonselect queries
 
-**This is core package!**
-Install this package only with specific database package like: 
-- Databasic.&#60;DatabaseType&#62;
+## Instalation
+**This is core package**. Install this package only with specific database package like: Databasic.&#60;DatabaseType&#62;:
+```nuget
+PM> Install-Package Databasic.MsSql
+```
+Or:
+```nuget
+PM> Install-Package Databasic.MySql
+```
+Or both of them if you wana to use more databases simultaneously.
 
-// TODO:
+
+
 ## Basic Examples
 ```vb
 Imports Databasic
