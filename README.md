@@ -97,9 +97,9 @@ using System.Collections.Generic;
 class Dealer: Person {
 	public int? Id { get; set; }
 	[Column("Firstname"), Trim]
-	public new string FirstName { get; set; }
+	public string FirstName { get; set; }
 	[Column("Secondname")]
-	public new string SecondName { get; set; }
+	public string SecondName { get; set; }
 	public double? TurnOver { get; set; }
 
 	public static Dealer GetById (int id) {
