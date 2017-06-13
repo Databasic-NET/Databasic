@@ -6,7 +6,7 @@
 - allowing to run any nonselect queries
 
 ## Instalation
-**This is core package**. Install this package only with specific database package like: Databasic.&#60;DatabaseType&#62;:
+**This is core package ionly**. Install this package only by installing specific database package like: Databasic.&#60;DatabaseType&#62;. Then this package will be installed automaticly with the specific database package.
 ```nuget
 PM> Install-Package Databasic.MsSql
 ```
