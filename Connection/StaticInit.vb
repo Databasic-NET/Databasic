@@ -15,10 +15,10 @@ Partial Public MustInherit Class Connection
         If Not Connection._staticInitDone Then
             Connection._staticInitDoneLock.EnterWriteLock()
             Connection._staticInitDoneLock.ExitUpgradeableReadLock()
-            Connection._staticInitDone = True
-            Connection._staticInitCompleteConfig()
+			Connection._staticInitDone = True
 			Connection._staticInitCompleteProviders()
-			Databasic.ActiveRecord.Resource.StaticInit(Databasic.Connection.Config.Count)
+			Connection._staticInitCompleteConfig()
+			Databasic.ProviderResource.StaticInit(Databasic.Connection.Config.Count)
 			Connection._staticInitDoneLock.ExitWriteLock()
         Else
             Connection._staticInitDoneLock.ExitUpgradeableReadLock()
@@ -44,26 +44,29 @@ Partial Public MustInherit Class Connection
 
     Private Shared Sub _staticInitCompleteProviders()
         Dim result As New Dictionary(Of String, Type)
-        Try
-            Dim assemblyFolder As String = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)
-            Dim assemblyNeighbours As IEnumerable(Of Assembly) = (
-                From file In Directory.GetFiles(assemblyFolder)
-                Where Path.GetExtension(file).ToLower() = ".dll"
-                Select Assembly.LoadFrom(file)
-            )
-            Dim assemblyName As String
-            Dim connectionType As Type
-            Dim clientName As String
+		Try
+			Dim assemblyFolder As String = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)
+			Dim assemblyNeighbours As IEnumerable(Of Assembly) = (
+				From file In Directory.GetFiles(assemblyFolder)
+				Where Path.GetExtension(file).ToLower() = ".dll"
+				Select Assembly.LoadFrom(file)
+			)
+			Dim assemblyName As String
+			Dim connectionType As Type
+			Dim connection As Connection
 			For Each assembly As Reflection.Assembly In assemblyNeighbours
 				assemblyName = assembly.GetName().Name
 				If assemblyName.IndexOf("Databasic.") = 0 AndAlso assemblyName <> "Databasic" Then
 					connectionType = assembly.GetType(assemblyName + ".Connection")
-					clientName = connectionType.GetField("ClientName", BindingFlags.Public Or BindingFlags.Static).GetValue(Nothing)
-					Connection._supportedProviders.Add(clientName, connectionType)
+					If Not TypeOf connectionType Is Type Then Continue For
+					connection = Activator.CreateInstance(connectionType)
+					Connection._supportedProviders.Add(connection.ClientName, connectionType)
+					Connection._providersResources.Add(connection.ClientName, Activator.CreateInstance(connection.ProviderResource))
 				End If
 			Next
 		Catch ex As Exception
-        End Try
+			Events.RaiseError(ex)
+		End Try
     End Sub
 
 End Class

@@ -42,7 +42,7 @@ Public MustInherit Class Statement
 	''' <returns>New specificly typed SQL statement.</returns>
 	Friend Shared Function PrepareLocal(sql As String, connection As Connection) As Statement
 		Return Activator.CreateInstance(
-			connection.StatementType,
+			connection.Statement,
 			New Object() {sql, connection.Provider}
 		)
 	End Function
@@ -54,7 +54,7 @@ Public MustInherit Class Statement
 	''' <returns>New specificly typed SQL statement.</returns>
 	Friend Shared Function PrepareLocal(sql As String, transaction As Transaction) As Statement
 		Return Activator.CreateInstance(
-			transaction.ConnectionWrapper.StatementType,
+			transaction.ConnectionWrapper.Statement,
 			New Object() {sql, transaction.Instance}
 		)
 	End Function
@@ -66,24 +66,15 @@ Public MustInherit Class Statement
 	''' <summary>
 	''' Create and prepare database SQL statement. Put '@' char before all param names in your SQL code.
 	''' </summary>
-	''' <param name="sql">SQL statement.</param>
-	''' <returns>New specificly typed SQL statement by connection.</returns>
-	Public Shared Function Prepare(sql As String) As Statement
-		Return Statement.PrepareLocal(sql, Connection.Get(
-			Tools.GetConnectionIndexByClassAttr(Tools.GetEntryClassType())
-		))
-	End Function
-	''' <summary>
-	''' Create and prepare database SQL statement. Put '@' char before all param names in your SQL code.
-	''' </summary>
 	''' <param name="sql">SQL code for statement. Put '@' char before all param names in your SQL code.</param>
 	''' <param name="connectionIndex">
 	''' Database connection index from App|Web.config to use specific database connection, 
 	''' default value is 0 to use first connection settings subnode from &lt;connectionStrings&gt; config node.
 	''' </param>
 	''' <returns>New specificly typed SQL statement by connection.</returns>
-	Public Shared Function Prepare(sql As String, Optional connectionIndex As Int32 = Database.DEFAUT_CONNECTION_INDEX) As Statement
-		Return Statement.PrepareLocal(sql, Connection.Get(connectionIndex))
+	Public Shared Function Prepare(sql As String, Optional connectionIndex As Int32? = Nothing) As Statement
+		If Not connectionIndex.HasValue Then connectionIndex = Tools.GetConnectionIndexByClassAttr(Tools.GetEntryClassType(), False)
+		Return Statement.PrepareLocal(sql, Connection.Get(connectionIndex.Value))
 	End Function
 	''' <summary>
 	''' Create and prepare database SQL statement. Put '@' char before all param names in your SQL code.
@@ -92,7 +83,7 @@ Public MustInherit Class Statement
 	''' Database connection name from App|Web.config to use specific database connection, 
 	''' default value is 'DefaultConnection' to use default connection settings subnode from &lt;connectionStrings&gt; config node.
 	''' <returns>New specificly typed SQL statement by connection.</returns>
-	Public Shared Function Prepare(sql As String, Optional connectionName As String = Database.DEFAUT_CONNECTION_NAME) As Statement
+	Public Shared Function Prepare(sql As String, connectionName As String) As Statement
 		Return Statement.PrepareLocal(sql, Connection.Get(connectionName))
 	End Function
 	''' <summary>
@@ -101,7 +92,7 @@ Public MustInherit Class Statement
 	''' <param name="sql">SQL code for statement. Put '@' char before all param names in your SQL code.</param>
 	''' <param name="connection">Your specific database connection instance to execute this SQL statement inside.</param>
 	''' <returns>New specificly typed SQL statement by connection.</returns>
-	Public Shared Function Prepare(sql As String, Optional connection As Connection = Nothing) As Statement
+	Public Shared Function Prepare(sql As String, connection As Connection) As Statement
 		Return Statement.PrepareLocal(sql, connection)
 	End Function
 	''' <summary>
@@ -111,7 +102,7 @@ Public MustInherit Class Statement
 	''' <param name="sql">SQL code for statement. Put '@' char before all param names in your SQL code.</param>
 	''' <param name="transaction">Database transaction from current connection to execute this SQL statement inside.</param>
 	''' <returns>New specificly typed SQL statement by connection.</returns>
-	Public Shared Function Prepare(sql As String, Optional transaction As Transaction = Nothing) As Statement
+	Public Shared Function Prepare(sql As String, transaction As Transaction) As Statement
 		Return Statement.PrepareLocal(sql, transaction)
 	End Function
 
@@ -124,7 +115,11 @@ Public MustInherit Class Statement
 	''' </summary>
 	''' <returns>SQL statement instance with opened data reader.</returns>
 	Public Function FetchOne() As Statement
-		Me.Reader = Me.Command.ExecuteReader(CommandBehavior.SingleRow)
+		Try
+			Me.Reader = Me.Command.ExecuteReader(CommandBehavior.SingleRow)
+		Catch ex As Exception
+			Events.RaiseError(ex)
+		End Try
 		Return Me
 	End Function
 	''' <summary>
@@ -134,7 +129,11 @@ Public MustInherit Class Statement
 	''' <returns>SQL statement instance with opened data reader.</returns>
 	Public Function FetchOne(sqlParams As Object) As Statement
 		Me.addParamsWithValue(sqlParams)
-		Me.Reader = Me.Command.ExecuteReader(CommandBehavior.SingleRow)
+		Try
+			Me.Reader = Me.Command.ExecuteReader(CommandBehavior.SingleRow)
+		Catch ex As Exception
+			Events.RaiseError(ex)
+		End Try
 		Return Me
 	End Function
 	''' <summary>
@@ -144,7 +143,11 @@ Public MustInherit Class Statement
 	''' <returns>SQL statement instance with opened data reader.</returns>
 	Public Function FetchOne(sqlParams As Dictionary(Of String, Object)) As Statement
 		Me.addParamsWithValue(sqlParams)
-		Me.Reader = Me.Command.ExecuteReader(CommandBehavior.SingleRow)
+		Try
+			Me.Reader = Me.Command.ExecuteReader(CommandBehavior.SingleRow)
+		Catch ex As Exception
+			Events.RaiseError(ex)
+		End Try
 		Return Me
 	End Function
 
@@ -166,7 +169,11 @@ Public MustInherit Class Statement
 	''' <param name="commandBehavior">SQL data reader command behaviour, optional.</param>
 	''' <returns>SQL statement instance with opened data reader.</returns>
 	Public Function FetchAll(Optional ByVal commandBehavior As CommandBehavior = CommandBehavior.Default) As Statement
-		Me.Reader = Me.Command.ExecuteReader(commandBehavior)
+		Try
+			Me.Reader = Me.Command.ExecuteReader(commandBehavior)
+		Catch ex As Exception
+			Events.RaiseError(ex)
+		End Try
 		Return Me
 	End Function
 	''' <summary>
@@ -177,7 +184,11 @@ Public MustInherit Class Statement
 	''' <returns>SQL statement instance with opened data reader.</returns>
 	Public Function FetchAll(sqlParams As Object, Optional commandBehavior As CommandBehavior = CommandBehavior.Default) As Statement
 		Me.addParamsWithValue(sqlParams)
-		Me.Reader = Me.Command.ExecuteReader(commandBehavior)
+		Try
+			Me.Reader = Me.Command.ExecuteReader(commandBehavior)
+		Catch ex As Exception
+			Events.RaiseError(ex)
+		End Try
 		Return Me
 	End Function
 	''' <summary>
@@ -188,7 +199,11 @@ Public MustInherit Class Statement
 	''' <returns>SQL statement instance with opened data reader.</returns>
 	Public Function FetchAll(sqlParams As Dictionary(Of String, Object), Optional commandBehavior As CommandBehavior = CommandBehavior.Default) As Statement
 		Me.addParamsWithValue(sqlParams)
-		Me.Reader = Me.Command.ExecuteReader(commandBehavior)
+		Try
+			Me.Reader = Me.Command.ExecuteReader(commandBehavior)
+		Catch ex As Exception
+			Events.RaiseError(ex)
+		End Try
 		Return Me
 	End Function
 
@@ -201,7 +216,13 @@ Public MustInherit Class Statement
 	''' </summary>
 	''' <returns>Affected rows count.</returns>
 	Public Function Exec() As Int32
-		Return Me.Command.ExecuteNonQuery()
+		Dim r As Int32 = 0
+		Try
+			r = Me.Command.ExecuteNonQuery()
+		Catch ex As Exception
+			Events.RaiseError(ex)
+		End Try
+		Return r
 	End Function
 	''' <summary>
 	''' Execute any non select SQL statement and return affected rows count.
@@ -219,7 +240,13 @@ Public MustInherit Class Statement
 	''' <returns>Affected rows count.</returns>
 	Public Function Exec(sqlParams As Dictionary(Of String, Object)) As Int32
 		Me.addParamsWithValue(sqlParams)
-		Return Me.Command.ExecuteNonQuery()
+		Dim r As Int32 = 0
+		Try
+			r = Me.Command.ExecuteNonQuery()
+		Catch ex As Exception
+			Events.RaiseError(ex)
+		End Try
+		Return r
 	End Function
 
 
@@ -285,20 +312,16 @@ Public MustInherit Class Statement
 
 
 
-	''' <summary>
-	''' Set up all sql params into internal Command instance.
-	''' </summary>
-	''' <param name="sqlParams">Anonymous object with named keys as SQL statement params without any '@' chars in object keys.</param>
-	Protected Overridable Sub addParamsWithValue(sqlParams As Object)
-
-	End Sub
-	''' <summary>
-	''' Set up all sql params into internal Command instance.
-	''' </summary>
-	''' <param name="sqlParams">Dictionary with named keys as SQL statement params without any '@' chars in dictionary keys.</param>
-	Protected Overridable Sub addParamsWithValue(sqlParams As Dictionary(Of String, Object))
-
-	End Sub
+    ''' <summary>
+    ''' Set up all sql params into internal Command instance.
+    ''' </summary>
+    ''' <param name="sqlParams">Anonymous object with named keys as SQL statement params without any '@' chars in object keys.</param>
+    Protected MustOverride Sub addParamsWithValue(sqlParams As Object)
+    ''' <summary>
+    ''' Set up all sql params into internal Command instance.
+    ''' </summary>
+    ''' <param name="sqlParams">Dictionary with named keys as SQL statement params without any '@' chars in dictionary keys.</param>
+    Protected MustOverride Sub addParamsWithValue(sqlParams As Dictionary(Of String, Object))
 
 
 

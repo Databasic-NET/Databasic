@@ -61,14 +61,19 @@
     <Import Include="System.Threading.Tasks" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ActiveRecord\Entity\GetterSetter.vb" />
+    <Compile Include="ActiveRecord\Entity\Table.vb" />
+    <Compile Include="ActiveRecord\Entity\Columns.vb" />
+    <Compile Include="ActiveRecord\Entity\InstanceGettersSetters.vb" />
+    <Compile Include="ActiveRecord\Entity\Manipulations.vb" />
     <Compile Include="ActiveRecord\Resources\Columns.vb" />
     <Compile Include="Attributes\Format.vb" />
+    <Compile Include="Attributes\AutoIncrement.vb" />
     <Compile Include="Attributes\Trim.vb" />
     <Compile Include="Misc\Enums.vb" />
     <Compile Include="MetaDescriptor.vb" />
     <Compile Include="Misc\Tools.vb" />
-    <Compile Include="Provider\Resource\Manipulations.vb" />
+    <Compile Include="ProviderResource\Columns.vb" />
+    <Compile Include="ProviderResource\Manipulations.vb" />
     <Compile Include="ActiveRecord\Resources\Table.vb" />
     <Compile Include="Attributes\Column.vb" />
     <Compile Include="Attributes\Connection.vb" />
@@ -79,12 +84,12 @@
     <Compile Include="Connection\Opening.vb" />
     <Compile Include="Misc\Events.vb" />
     <Compile Include="Connection\Closing.vb" />
-    <Compile Include="Provider\Resource\Getters.vb" />
+    <Compile Include="ProviderResource\DatabaseGetters.vb" />
     <Compile Include="Connection.vb" />
     <Compile Include="Misc\Structs.vb" />
     <Compile Include="Transaction.vb" />
     <Compile Include="Connection\StaticInit.vb" />
-    <Compile Include="Database.vb" />
+    <Compile Include="ActiveRecord\Entity\DatabaseGetters.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
       <AutoGen>True</AutoGen>
@@ -100,7 +105,7 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="ActiveRecord\Entity\Reader.vb" />
+    <Compile Include="ActiveRecord\Entity\DatabaseReader.vb" />
     <Compile Include="ActiveRecord\Resources\InstanceGetter.vb" />
     <Compile Include="Statement.vb" />
   </ItemGroup>

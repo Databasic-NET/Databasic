@@ -10,13 +10,13 @@ Public Enum CommandBehavior
 End Enum
 
 Public Enum IsolationLevel
-    Chaos = &H10
-    ReadCommitted = &H1000
-    ReadUncommitted = &H100
-    RepeatableRead = &H10000
-    Serializable = &H100000
-    Snapshot = &H1000000
-    Unspecified = -1
+	Chaos = &H10
+	ReadCommitted = &H1000
+	ReadUncommitted = &H100
+	RepeatableRead = &H10000
+	Serializable = &H100000
+	Snapshot = &H1000000
+	Unspecified = -1
 End Enum
 
 Public Enum KeyType
@@ -31,7 +31,7 @@ Public Enum DuplicateKeyBehaviour
     OverwriteByNewValue
 End Enum
 
-Friend Enum MemberInfoType
+Public Enum MemberInfoType
 	Prop
 	Field
 End Enum

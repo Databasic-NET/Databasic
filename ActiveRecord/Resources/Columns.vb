@@ -7,105 +7,35 @@ Namespace ActiveRecord
 
 
 
-		<CompilerGenerated>
-		Private Shared _columns As New Dictionary(Of Int32, Dictionary(Of String, List(Of String)))
-		<CompilerGenerated>
-		Private Shared _columnsLocks As New Dictionary(Of Int32, ReaderWriterLockSlim)
 
 
-
-
-		Friend Shared Sub StaticInit(connectionsConfigLength As Int32)
-			For index As Int32 = 0 To connectionsConfigLength - 1
-				Databasic.ActiveRecord.Resource._columnsLocks.Add(index, New ReaderWriterLockSlim())
-			Next
-		End Sub
-
-
-
-
-
-		Public Shared Function Columns(resourceType As Type, Optional tableIndex As Int16 = 0) As List(Of String)
-			Dim result As List(Of String) = Nothing
-			Dim table As String = Resource.Table(resourceType, tableIndex)
-			Dim connectionIndex As Int16 = Tools.GetConnectionIndexByClassAttr(resourceType)
-			Dim tablesAndColumns As Dictionary(Of String, List(Of String))
-			Dim loadingColumnsFromDb As Boolean = True
-			Resource._columnsLocks(connectionIndex).EnterUpgradeableReadLock()
-
-			If ActiveRecord.Resource._columns.ContainsKey(connectionIndex) Then
-				tablesAndColumns = ActiveRecord.Resource._columns(connectionIndex)
-				If tablesAndColumns.ContainsKey(table) Then
-					result = tablesAndColumns(table)
-					loadingColumnsFromDb = False
-				End If
-				Resource._columnsLocks(connectionIndex).ExitUpgradeableReadLock()
-			Else
-				Resource._columnsLocks(connectionIndex).EnterWriteLock()
-				Resource._columnsLocks(connectionIndex).ExitUpgradeableReadLock()
-				ActiveRecord.Resource._columns.Add(connectionIndex, New Dictionary(Of String, List(Of String)))
-				Resource._columnsLocks(connectionIndex).ExitWriteLock()
-			End If
-			If loadingColumnsFromDb Then
-				Dim connection As Connection = Connection.Get(connectionIndex)
-				Dim resource As Provider.Resource = Activator.CreateInstance(connection.ResourceType)
-				result = resource.GetTableColumns(connection, table)
-				If result.Count = 0 Then
-					Events.RaiseError(New Exception(
-						$"No columns found for table: '{table}'. Is the table name correct?"
-					))
-				End If
-				If TypeOf result Is List(Of String) Then
-					Databasic.ActiveRecord.Resource._columnsLocks(connectionIndex).EnterWriteLock()
-					tablesAndColumns = ActiveRecord.Resource._columns(connectionIndex)
-					If Not tablesAndColumns.ContainsKey(table) Then
-						tablesAndColumns.Add(table, result)
-					End If
-					Databasic.ActiveRecord.Resource._columnsLocks(connectionIndex).ExitWriteLock()
-				End If
-			End If
-			Return result
-		End Function
 		Public Shared Function Columns(Of TResource)(separator As String, Optional tableIndex As Int16 = 0) As String
 			Return String.Join(
-				separator,
-				Enumerable.ToArray(Of String)(
-					Resource.Columns(GetType(TResource), tableIndex)
-				)
+				separator, Databasic.ProviderResource.ColumnsArray(GetType(TResource), tableIndex)
 			)
 		End Function
 		Public Shared Function Columns(Of TResource)(Optional tableIndex As Int16 = 0, Optional separator As String = ",") As String
 			Return String.Join(
-				separator,
-				Enumerable.ToArray(Of String)(
-					Resource.Columns(GetType(TResource), tableIndex)
-				)
+				separator, Databasic.ProviderResource.ColumnsArray(GetType(TResource), tableIndex)
 			)
 		End Function
-
 		Public Shared Function Columns(separator As String, Optional tableIndex As Int16 = 0) As String
 			Return String.Join(
-				separator,
-				Enumerable.ToArray(Of String)(
-					Resource.Columns(Tools.GetEntryClassType(), tableIndex)
-				)
+				separator, Databasic.ProviderResource.ColumnsArray(Tools.GetEntryClassType(), tableIndex)
 			)
 		End Function
-
 		Public Shared Function Columns(Optional tableIndex As Int16 = 0, Optional separator As String = ",") As String
 			Return String.Join(
-				separator,
-				Enumerable.ToArray(Of String)(
-					Resource.Columns(Tools.GetEntryClassType(), tableIndex)
-				)
+				separator, Databasic.ProviderResource.ColumnsArray(Tools.GetEntryClassType(), tableIndex)
 			)
 		End Function
 
 
 
 
-		Public Shared Function ColumnsExcept(Of TResource)(exceptColumns As String(), separator As String, Optional tableIndex As Int16 = Database.DEFAUT_CONNECTION_INDEX) As String
-			Dim result As List(Of String) = Resource.Columns(GetType(TResource), tableIndex)
+
+		Public Shared Function ColumnsExcept(Of TResource)(exceptColumns As String(), Optional tableIndex As Int16 = 0, Optional separator As String = ",") As String
+			Dim result As List(Of String) = Databasic.ProviderResource.ColumnsList(GetType(TResource), tableIndex)
 			For Each exceptCol As String In exceptColumns
 				If result.Contains(exceptCol) Then result.Remove(exceptCol)
 			Next
@@ -114,8 +44,28 @@ Namespace ActiveRecord
 				Enumerable.ToArray(Of String)(result)
 			)
 		End Function
-		Public Shared Function ColumnsExcept(Of TResource)(exceptColumns As String(), Optional tableIndex As Int16 = Database.DEFAUT_CONNECTION_INDEX, Optional separator As String = ",") As String
-			Dim result As List(Of String) = Resource.Columns(GetType(TResource), tableIndex)
+		Public Shared Function ColumnsExcept(Of TResource)(exceptColumns As String(), separator As String, Optional tableIndex As Int16 = 0) As String
+			Dim result As List(Of String) = Databasic.ProviderResource.ColumnsList(GetType(TResource), tableIndex)
+			For Each exceptCol As String In exceptColumns
+				If result.Contains(exceptCol) Then result.Remove(exceptCol)
+			Next
+			Return String.Join(
+				separator,
+				Enumerable.ToArray(Of String)(result)
+			)
+		End Function
+		Public Shared Function ColumnsExcept(exceptColumns As String(), Optional tableIndex As Int16 = 0, Optional separator As String = ",") As String
+			Dim result As List(Of String) = Databasic.ProviderResource.ColumnsList(Tools.GetEntryClassType(), tableIndex)
+			For Each exceptCol As String In exceptColumns
+				If result.Contains(exceptCol) Then result.Remove(exceptCol)
+			Next
+			Return String.Join(
+				separator,
+				Enumerable.ToArray(Of String)(result)
+			)
+		End Function
+		Public Shared Function ColumnsExcept(exceptColumns As String(), separator As String, Optional tableIndex As Int16 = 0) As String
+			Dim result As List(Of String) = Databasic.ProviderResource.ColumnsList(Tools.GetEntryClassType(), tableIndex)
 			For Each exceptCol As String In exceptColumns
 				If result.Contains(exceptCol) Then result.Remove(exceptCol)
 			Next
@@ -125,57 +75,81 @@ Namespace ActiveRecord
 			)
 		End Function
 
-		Public Shared Function ColumnsExcept(exceptColumns As String(), separator As String, Optional tableIndex As Int16 = Database.DEFAUT_CONNECTION_INDEX) As String
-			Dim result As List(Of String) = Resource.Columns(Tools.GetEntryClassType(), tableIndex)
-			For Each exceptCol As String In exceptColumns
-				If result.Contains(exceptCol) Then result.Remove(exceptCol)
-			Next
-			Return String.Join(
-				separator,
-				Enumerable.ToArray(Of String)(result)
-			)
-		End Function
-
-		Public Shared Function ColumnsExcept(exceptColumns As String(), Optional tableIndex As Int16 = Database.DEFAUT_CONNECTION_INDEX, Optional separator As String = ",") As String
-			Dim result As List(Of String) = Resource.Columns(Tools.GetEntryClassType(), tableIndex)
-			For Each exceptCol As String In exceptColumns
-				If result.Contains(exceptCol) Then result.Remove(exceptCol)
-			Next
-			Return String.Join(
-				separator,
-				Enumerable.ToArray(Of String)(result)
-			)
-		End Function
 
 
 
 
-		''' <summary>
-		''' Get declared identifier table column name by 'resourceType' argument.
-		''' </summary>
-		''' <param name="resourceType">Class type, inherited from Resource class with declared protected static field 'idColumn' as string.</param>
-		''' <returns>Declared database table id column name from resource class.</returns>
-		Public Shared Function UniqueColumn(resourceType As Type) As String
-			Dim result As String = ""
-			Dim instance As Object = Activator.CreateInstance(resourceType)
-			Dim fieldInfo As FieldInfo = resourceType.GetField("uniqueColumnName", BindingFlags.Instance Or BindingFlags.Static Or BindingFlags.NonPublic)
-			If Not TypeOf fieldInfo Is FieldInfo Then
-				Throw New Exception($"Class '{resourceType.FullName}' has no field 'uniqueColumnName'. Please define this field as string.")
+		Public Shared Function KeyColumns(ByRef resourceType As Type, Optional keyName As String = Databasic.Defaults.KEY_NAME) As KeyColumns
+			Dim result As KeyColumns = New KeyColumns
+			Dim allKeyCols As AllKeyColumns = MetaDescriptor.GetAllKeyColumns(resourceType)
+			If allKeyCols.PrimaryColumns.ContainsKey(keyName) Then
+				result.Type = KeyType.Primary
+				result.Columns = allKeyCols.PrimaryColumns(keyName)
+			ElseIf allKeyCols.UniqueColumns.ContainsKey(keyName) Then
+				result.Type = KeyType.Unique
+				result.Columns = allKeyCols.UniqueColumns(keyName)
+			Else
+				Throw New Exception(String.Format(
+				"Class '{0}' has no properties or fields with 'PrimaryKey' or 'UniqueKey' attributes defined. " +
+				"Please set up this class properly by database structure to process this operation again.",
+				resourceType.FullName
+			))
 			End If
-			result = DirectCast(fieldInfo.GetValue(instance), String)
-			Return If(String.IsNullOrEmpty(result), Database.DEFAUT_UNIQUE_COLUMN_NAME, result)
+			result.AutoIncrementColumn = allKeyCols.AutoIncrementColumn
+			Return result
 		End Function
-		''' <summary>
-		''' Get declared identifier table column name from generic type 'TResource'.
-		''' </summary>
-		''' <typeparam name="TResource">Class name, inherited from Resource class with declared protected static field 'idColumn' as string.</typeparam>
-		''' <returns>Declared database table id column name from resource class.</returns>
-		Public Shared Function UniqueColumn(Of TResource)() As String
-			Return Resource.UniqueColumn(GetType(TResource))
+		Public Shared Function KeyColumns(ByRef classMetaDescription As MetaDescription, Optional keyName As String = Databasic.Defaults.KEY_NAME) As KeyColumns
+			Dim result As KeyColumns = New KeyColumns
+			If classMetaDescription.PrimaryColumns.ContainsKey(keyName) Then
+				result.Type = KeyType.Primary
+				result.Columns = classMetaDescription.PrimaryColumns(keyName)
+			ElseIf classMetaDescription.UniqueColumns.ContainsKey(keyName) Then
+				result.Type = KeyType.Unique
+				result.Columns = classMetaDescription.UniqueColumns(keyName)
+			Else
+				Throw New Exception(String.Format(
+				"Class '{0}' has no properties or fields with 'PrimaryKey' or 'UniqueKey' attributes defined. " +
+				"Please set up this class properly by database structure to process this operation again.",
+				classMetaDescription.ClassType.FullName
+			))
+			End If
+			result.AutoIncrementColumn = classMetaDescription.AutoIncrementColumn
+			Return result
 		End Function
-		Public Function UniqueColumn() As String
-			Return Resource.UniqueColumn(Me.GetType())
+		Public Shared Function KeyColumns(resourceType As Type, keyType As KeyType, Optional keyName As String = Databasic.Defaults.KEY_NAME) As KeyColumns
+			Dim result As KeyColumns = New KeyColumns With {
+				.Type = keyType
+			}
+			Dim allKeyCols As AllKeyColumns = MetaDescriptor.GetAllKeyColumns(resourceType, keyType)
+			If keyType = KeyType.Primary AndAlso allKeyCols.PrimaryColumns.ContainsKey(keyName) Then
+				result.Columns = allKeyCols.PrimaryColumns(keyName)
+			ElseIf keyType = KeyType.Unique AndAlso allKeyCols.UniqueColumns.ContainsKey(keyName) Then
+				result.Columns = allKeyCols.UniqueColumns(keyName)
+			Else
+				Throw New Exception(String.Format(
+				"Class '{0}' has no properties or fields with '{1}' attribute defined. " +
+				"Please set up this class properly by database structure to process this operation again.",
+				resourceType.FullName,
+				If(keyType = KeyType.Primary, "PrimaryKey", "UniqueKey")
+			))
+			End If
+			result.AutoIncrementColumn = allKeyCols.AutoIncrementColumn
+			Return result
 		End Function
+		Public Shared Function KeyColumns(Of TResource)(Optional keyType As KeyType = KeyType.Primary, Optional keyName As String = Databasic.Defaults.KEY_NAME) As KeyColumns
+			Return Resource.KeyColumns(GetType(TResource), keyType, keyName)
+		End Function
+		Public Function KeyColumns(Optional keyType As KeyType = KeyType.Primary, Optional keyName As String = Databasic.Defaults.KEY_NAME) As KeyColumns
+			Return Resource.KeyColumns(Me.GetType(), keyType, keyName)
+		End Function
+		Public Shared Function KeyColumns(Of TResource)(keyName As String, Optional keyType As KeyType = KeyType.Primary) As KeyColumns
+			Return Resource.KeyColumns(GetType(TResource), keyType, keyName)
+		End Function
+		Public Function KeyColumns(keyName As String, Optional keyType As KeyType = KeyType.Primary) As KeyColumns
+			Return Resource.KeyColumns(Me.GetType(), keyType, keyName)
+		End Function
+
+
 
 
 

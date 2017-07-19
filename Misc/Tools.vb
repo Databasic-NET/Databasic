@@ -8,13 +8,17 @@ Friend Class Tools
 	End Function
 
 	Friend Shared Function GetConnectionIndexByClassAttr(type As Type, Optional throwException As Boolean = True) As Int32
-		Dim connAttr As ConnectionAttribute = DirectCast(Attribute.GetCustomAttribute(type, MetaDescriptor.ConnectionAttrType), ConnectionAttribute)
-		If throwException AndAlso Not TypeOf connAttr Is ConnectionAttribute Then
-			Throw New Exception(
-				$"Class '{type.FullName}' has no 'Connection' attribute. " +
-				"Add 'Connection' class attribute or specify connection instance, " +
-				"connection config index or connection config name."
-			)
+		Dim connAttr As ConnectionAttribute = DirectCast(Attribute.GetCustomAttribute(type, Constants.ConnectionAttrType), ConnectionAttribute)
+		If Not TypeOf connAttr Is ConnectionAttribute Then
+			If throwException Then
+				Throw New Exception(
+					$"Class '{type.FullName}' has no 'Connection' attribute. " +
+					"Add 'Connection' class attribute or specify connection instance, " +
+					"connection config index or connection config name."
+				)
+			Else
+				Return Databasic.Defaults.CONNECTION_INDEX
+			End If
 		End If
 		Return connAttr.ConnectionIndex
 	End Function

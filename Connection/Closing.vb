@@ -31,21 +31,25 @@ Partial Public MustInherit Class Connection
             Connection._registerLock.EnterWriteLock()
             ' A. read check end - if register contains any connection records under process and thread key
             Connection._registerLock.ExitUpgradeableReadLock()
-            ' store all connections for current process id and thread in local variable to close them
-            processAndThreadConnections = Connection._connectionsRegister(processAndThreadKey)
-            ' lets change the register - remove records under thread and process key
-            Connection._connectionsRegister.Remove(processAndThreadKey)
-            Connection._registerLocks.Remove(processAndThreadKey)
-            ' close all connections for current process na thread only through local variable
-            processAndThreadConnectionsKeys = DirectCast(processAndThreadConnections.Keys.ToArray().Clone(), Int32())
-            For Each key As Int32 In processAndThreadConnectionsKeys
-                provider = processAndThreadConnections(key).Provider
-                processAndThreadConnections.Remove(key)
-                If provider.State = ConnectionState.Open Then
-                    provider.Close()
-                    provider.Dispose()
-                End If
-            Next
+            Try
+                ' store all connections for current process id and thread in local variable to close them
+                processAndThreadConnections = Connection._connectionsRegister(processAndThreadKey)
+                ' lets change the register - remove records under thread and process key
+                Connection._connectionsRegister.Remove(processAndThreadKey)
+                Connection._registerLocks.Remove(processAndThreadKey)
+                ' close all connections for current process na thread only through local variable
+                processAndThreadConnectionsKeys = DirectCast(processAndThreadConnections.Keys.ToArray().Clone(), Int32())
+                For Each key As Int32 In processAndThreadConnectionsKeys
+                    provider = processAndThreadConnections(key).Provider
+                    processAndThreadConnections.Remove(key)
+                    If provider.State = ConnectionState.Open Then
+                        provider.Close()
+                        provider.Dispose()
+                    End If
+                Next
+            Catch ex As Exception
+                Databasic.Events.RaiseError(ex, New EventArgs())
+            End Try
             ' B. write lock end - to change register records under process and thread key
             Connection._registerLock.ExitWriteLock()
         Else

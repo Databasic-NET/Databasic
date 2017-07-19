@@ -2,17 +2,28 @@
 
 Public Class Events
 
-    ''' <summary>
-    ''' Custom error handler to print or log any database error.
-    ''' </summary>
-    Public Shared Event [Error] As EventHandler
+	''' <summary>
+	''' Custom error handler to print or log any database error.
+	''' </summary>
+	Public Shared Event [Error] As ErrorHandler
 
-    Public Shared Sub RaiseError(exception As Exception, Optional e As EventArgs = Nothing)
-        If Not TypeOf e Is EventArgs Then e = New EventArgs
-        RaiseEvent [Error](exception, e)
-#If DEBUG Then
-        Throw exception
-#End If
-    End Sub
+	''' <summary>
+	''' Typed handler for catched Databasic error.
+	''' </summary>
+	''' <param name="e">Catched Exception.</param>
+	''' <param name="args">Empty event args object.</param>
+	Public Delegate Sub ErrorHandler(e As Exception, args As EventArgs)
+
+	Public Shared Sub RaiseError(ex As Exception, Optional args As EventArgs = Nothing)
+		If Not TypeOf args Is EventArgs Then args = New EventArgs
+		' check if Error event has any handlers, if not, thrown an exception
+		Dim fi As FieldInfo = GetType(Events).GetField("ErrorEvent", BindingFlags.Public Or BindingFlags.NonPublic Or BindingFlags.Static)
+		Dim del As Object = fi.GetValue(Nothing)
+		If del <> Nothing Then
+			RaiseEvent [Error](ex, args)
+		Else
+			Throw ex
+		End If
+	End Sub
 
 End Class
