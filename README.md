@@ -6,7 +6,7 @@
 - allowing to run any nonselect queries
 
 ## Instalation
-**This is core package**. Install this package only with specific database package like: Databasic.&#60;DatabaseType&#62;:
+**This is core package only**. Install this package only by installing specific database package like: Databasic.&#60;DatabaseType&#62;. Then this package will be installed automaticly with the specific database package.
 ```nuget
 PM> Install-Package Databasic.MsSql
 ```
@@ -97,9 +97,9 @@ using System.Collections.Generic;
 class Dealer: Person {
 	public int? Id { get; set; }
 	[Column("Firstname"), Trim]
-	public new string FirstName { get; set; }
+	public string FirstName { get; set; }
 	[Column("Secondname")]
-	public new string SecondName { get; set; }
+	public string SecondName { get; set; }
 	public double? TurnOver { get; set; }
 
 	public static Dealer GetById (int id) {
