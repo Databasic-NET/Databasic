@@ -4,28 +4,16 @@ Imports System.Threading
 
 Partial Public MustInherit Class ProviderResource
 
-
-
-
-
 	<CompilerGenerated>
 	Private Shared _columns As New Dictionary(Of Int32, Dictionary(Of String, Dictionary(Of String, Boolean)))
 	<CompilerGenerated>
 	Private Shared _columnsLocks As New Dictionary(Of Int32, ReaderWriterLockSlim)
-
-
-
-
 
 	Friend Shared Sub StaticInit(connectionsConfigLength As Int32)
 		For index As Int32 = 0 To connectionsConfigLength - 1
 			ProviderResource._columnsLocks.Add(index, New ReaderWriterLockSlim())
 		Next
 	End Sub
-
-
-
-
 
 	Public Shared Function IsColumnNullable(connectionIndex As Int32, table As String, column As String) As Boolean
 		Dim result As Boolean?
@@ -64,6 +52,7 @@ Partial Public MustInherit Class ProviderResource
 		End If
 		Return result
 	End Function
+
 	Public Shared Function ColumnsArray(resourceType As Type, Optional tableIndex As Int32 = 0) As String()
 		Dim result As String() = Nothing
 		Dim table As String = ActiveRecord.Resource.Table(resourceType, tableIndex)
@@ -89,6 +78,7 @@ Partial Public MustInherit Class ProviderResource
 		End If
 		Return result
 	End Function
+
 	Public Shared Function ColumnsList(resourceType As Type, Optional tableIndex As Int32 = 0) As List(Of String)
 		Dim result As List(Of String) = Nothing
 		Dim table As String = ActiveRecord.Resource.Table(resourceType, tableIndex)
@@ -114,11 +104,15 @@ Partial Public MustInherit Class ProviderResource
 		End If
 		Return result
 	End Function
+
 	Private Shared Function _columnsArray(connectionIndex As Int32, table As String) As String()
 		Dim result As String()
 		Dim connection As Connection = Connection.Get(connectionIndex)
 		Dim colsAndNulls As Dictionary(Of String, Boolean) = connection.GetProviderResource().GetTableColumns(table, connection)
-		If TypeOf colsAndNulls Is Dictionary(Of String, Boolean) AndAlso colsAndNulls.Count > 0 Then
+		If (
+			TypeOf colsAndNulls Is Dictionary(Of String, Boolean) AndAlso
+			colsAndNulls.Count > 0
+		) Then
 			result = colsAndNulls.Keys.ToArray()
 			If Not Databasic.ProviderResource._columns.ContainsKey(connectionIndex) Then
 				Databasic.ProviderResource._columns.Add(connectionIndex, New Dictionary(Of String, Dictionary(Of String, Boolean)))
@@ -136,16 +130,8 @@ Partial Public MustInherit Class ProviderResource
 		Return result
 	End Function
 
-
-
-
-
 	Public Overridable Function GetTableColumns(table As String, connection As Databasic.Connection) As Dictionary(Of String, Boolean)
 		Return New Dictionary(Of String, Boolean)
 	End Function
-
-
-
-
 
 End Class

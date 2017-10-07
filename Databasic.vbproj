@@ -62,6 +62,7 @@
     <Import Include="System.Threading.Tasks" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ActiveRecord\Entity\Columns\ColumnsExcept.vb" />
     <Compile Include="ActiveRecord\Entity\DatabaseGetters\GetById.vb" />
     <Compile Include="ActiveRecord\Entity\DatabaseGetters\GetByKey.vb" />
     <Compile Include="ActiveRecord\Entity\DatabaseGetters\GetCount.vb" />
@@ -77,8 +78,10 @@
     <Compile Include="ActiveRecord\Entity\Manipulations\Delete.vb" />
     <Compile Include="ActiveRecord\Entity\Manipulations\Save.vb" />
     <Compile Include="ActiveRecord\Entity\Table.vb" />
-    <Compile Include="ActiveRecord\Entity\Columns.vb" />
-    <Compile Include="ActiveRecord\Resources\Columns.vb" />
+    <Compile Include="ActiveRecord\Entity\Columns\Columns.vb" />
+    <Compile Include="ActiveRecord\Resources\Columns\ColumnsExcept.vb" />
+    <Compile Include="ActiveRecord\Resources\Columns\Columns.vb" />
+    <Compile Include="ActiveRecord\Resources\Columns\KeyColumns.vb" />
     <Compile Include="Attributes\Format.vb" />
     <Compile Include="Attributes\AutoIncrement.vb" />
     <Compile Include="Attributes\Trim.vb" />
@@ -88,7 +91,6 @@
     <Compile Include="Misc\Errors.vb" />
     <Compile Include="Misc\Tools.vb" />
     <Compile Include="ProviderResource\Columns.vb" />
-    <Compile Include="ProviderResource\Manipulations.vb" />
     <Compile Include="ActiveRecord\Resources\Table.vb" />
     <Compile Include="Attributes\Column.vb" />
     <Compile Include="Attributes\Connection.vb" />
@@ -102,6 +104,10 @@
     <Compile Include="ProviderResource\DatabaseGetters.vb" />
     <Compile Include="Connection.vb" />
     <Compile Include="Misc\Structs.vb" />
+    <Compile Include="ProviderResource\Manipulations\Save.vb" />
+    <Compile Include="ProviderResource\Manipulations\Insert.vb" />
+    <Compile Include="ProviderResource\Manipulations\Delete.vb" />
+    <Compile Include="ProviderResource\Manipulations\Update.vb" />
     <Compile Include="Transaction.vb" />
     <Compile Include="Connection\StaticInit.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />

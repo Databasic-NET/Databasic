@@ -1,12 +1,12 @@
 ﻿<Flags>
 Public Enum CommandBehavior
-    CloseConnection = &H20
-    [Default] = 0
-    KeyInfo = 4
-    SequentialAccess = &H10
-    SchemaOnly = 2
-    SingleResult = 1
-    SingleRow = 8
+	CloseConnection = &H20
+	[Default] = 0
+	KeyInfo = 4
+	SequentialAccess = &H10
+	SchemaOnly = 2
+	SingleResult = 1
+	SingleRow = 8
 End Enum
 
 Public Enum IsolationLevel
@@ -20,15 +20,15 @@ Public Enum IsolationLevel
 End Enum
 
 Public Enum KeyType
-    None
-    Primary
-    Unique
+	None
+	Primary
+	Unique
 End Enum
 
 Public Enum DuplicateKeyBehaviour
-    ThrownException
-    KeepFirstValue
-    OverwriteByNewValue
+	ThrownException
+	KeepFirstValue
+	OverwriteByNewValue
 End Enum
 
 Public Enum MemberInfoType

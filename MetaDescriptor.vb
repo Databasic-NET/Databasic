@@ -5,7 +5,7 @@ Imports Databasic
 
 Public Class MetaDescriptor
 
-    Private Shared _lock As ReaderWriterLockSlim = New ReaderWriterLockSlim()
+	Private Shared _lock As ReaderWriterLockSlim = New ReaderWriterLockSlim()
 	Private Shared _register As New Dictionary(Of String, MetaDescription)
 
 	Friend Shared Function GetIndexerPropertyName(Type As Type) As String
@@ -158,18 +158,18 @@ Public Class MetaDescriptor
 		Dim connectionAttr As ConnectionAttribute = DirectCast(Attribute.GetCustomAttribute(type, Constants.ConnectionAttrType), ConnectionAttribute)
 		Dim tableAttr As TableAttribute = DirectCast(Attribute.GetCustomAttribute(type, Constants.TableAttrType), TableAttribute)
 		Dim result As New MetaDescription With {
-            .ClassType = type,
-            .ConnectionIndex = If(TypeOf connectionAttr Is ConnectionAttribute, connectionAttr.ConnectionIndex, Databasic.Defaults.CONNECTION_INDEX),
-            .Tables = If(TypeOf tableAttr Is TableAttribute, tableAttr.Tables, New String() {})
-        }
-        MetaDescriptor._completeColumnsCollections(type, result)
-        Return result
-    End Function
+			.ClassType = type,
+			.ConnectionIndex = If(TypeOf connectionAttr Is ConnectionAttribute, connectionAttr.ConnectionIndex, Databasic.Defaults.CONNECTION_INDEX),
+			.Tables = If(TypeOf tableAttr Is TableAttribute, tableAttr.Tables, New String() {})
+		}
+		MetaDescriptor._completeColumnsCollections(type, result)
+		Return result
+	End Function
 
-    Private Shared Function _completeInstanceDataMembers(type As Type) As Dictionary(Of String, Databasic.MemberInfo)
-        Dim result As New Dictionary(Of String, Databasic.MemberInfo)
-        Dim indexerPropertyName As String = MetaDescriptor.GetIndexerPropertyName(type)
-        For Each prop As PropertyInfo In type.GetProperties(BindingFlags.Instance Or BindingFlags.Public Or BindingFlags.NonPublic)
+	Private Shared Function _completeInstanceDataMembers(type As Type) As Dictionary(Of String, Databasic.MemberInfo)
+		Dim result As New Dictionary(Of String, Databasic.MemberInfo)
+		Dim indexerPropertyName As String = MetaDescriptor.GetIndexerPropertyName(type)
+		For Each prop As PropertyInfo In type.GetProperties(BindingFlags.Instance Or BindingFlags.Public Or BindingFlags.NonPublic)
 			If (
 				(Not result.ContainsKey(prop.Name)) AndAlso
 				prop.Name <> indexerPropertyName AndAlso
@@ -184,7 +184,7 @@ Public Class MetaDescriptor
 				)
 			})
 		Next
-        For Each field As FieldInfo In type.GetFields(BindingFlags.Instance Or BindingFlags.Public Or BindingFlags.NonPublic)
+		For Each field As FieldInfo In type.GetFields(BindingFlags.Instance Or BindingFlags.Public Or BindingFlags.NonPublic)
 			If (
 				Not result.ContainsKey(field.Name) AndAlso
 				Not MetaDescriptor.IsCompilerGeneratedOrSystem(field)
@@ -198,8 +198,8 @@ Public Class MetaDescriptor
 				)
 			})
 		Next
-        Return result
-    End Function
+		Return result
+	End Function
 
 	Private Shared Sub _completeColumnsCollections(type As Type, ByRef result As MetaDescription)
 		Dim codeColumnName As String, dbColumnName As String

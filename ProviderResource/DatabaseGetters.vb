@@ -1,11 +1,13 @@
 ﻿Partial Public MustInherit Class ProviderResource
 
-
-
-
-
-	Public Overridable Function GetById(id As Int64, ByRef connectionOrTransaction As Object, ByRef classMetaDescription As MetaDescription) As Statement
-		Dim columns As String = String.Join(",", Databasic.ProviderResource.ColumnsArray(classMetaDescription.ClassType, 0))
+	Public Overridable Function GetById(
+		id As Int64,
+		ByRef connectionOrTransaction As Object,
+		ByRef classMetaDescription As MetaDescription
+	) As Statement
+		Dim columns As String = String.Join(
+			",", Databasic.ProviderResource.ColumnsArray(classMetaDescription.ClassType, 0)
+		)
 		Return Databasic.Statement.Prepare(
 			$"SELECT {columns} 
 			FROM {ActiveRecord.Resource.Table(classMetaDescription)} 
@@ -13,11 +15,6 @@
 			connectionOrTransaction
 		).FetchOne(New With {.idColumn = id})
 	End Function
-
-
-
-
-
 
 	Public Overridable Function GetByKey(
 		keyData As Dictionary(Of String, Object),
@@ -48,19 +45,11 @@
 		End If
 	End Function
 
-
-
-
-
-
-
 	Public MustOverride Function GetLastInsertedId(ByRef transaction As Databasic.Transaction, Optional ByRef classMetaDescription As MetaDescription = Nothing) As Object
-
-
-
 
 	Public Overridable Function GetCount(
 		conditionSqlStatement As String,
+		sqlParams As Object,
 		connectionOrTransaction As Object,
 		ByRef classMetaDescription As MetaDescription
 	) As Int64
@@ -80,11 +69,10 @@
 		End If
 		Dim sql As String = $"SELECT COUNT({countColumn}) FROM {table}"
 		If Not String.IsNullOrEmpty(conditionSqlStatement) Then sql += " WHERE " + conditionSqlStatement
-		Return Databasic.Statement.Prepare(sql, connectionOrTransaction).FetchOne().ToInstance(Of Int64)()
+		Return Databasic.Statement.Prepare(
+			sql, connectionOrTransaction
+		).FetchOne(sqlParams).ToInstance(Of Int64)()
 	End Function
-
-
-
 
 	Public Overridable Function GetList(
 		conditionSqlStatement As String,

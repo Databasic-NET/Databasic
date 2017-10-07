@@ -44,9 +44,5 @@
 			Return Resource.Table(Tools.GetEntryClassType(), tableIndex)
 		End Function
 
-
-
-
-
 	End Class
 End Namespace

@@ -15,8 +15,8 @@ Set-StrictMode -Version Latest
 # PowerShell v2.0 compatible version of [string]::IsNullOrWhitespace.
 function Test-StringIsNullOrWhitespace([string]$string)
 {
-    if ($string -ne $null) { $string = $string.Trim() }
-    return [string]::IsNullOrEmpty($string)
+ if ($string -ne $null) { $string = $string.Trim() }
+ return [string]::IsNullOrEmpty($string)
 }
 
 # Display the parameter values passed to this script.

@@ -41,15 +41,15 @@ Public MustInherit Class Statement
 	''' <param name="connection">Connection instance.</param>
 	''' <returns>New specificly typed SQL statement.</returns>
 	Friend Shared Function PrepareLocal(sql As String, connection As Connection) As Statement
-        Return Activator.CreateInstance(
-            connection.Statement,
-            New Object() {sql, If(
-                TypeOf connection.OpenedTransaction Is Transaction,
-                DirectCast(connection.OpenedTransaction, Object),
-                DirectCast(connection.Provider, Object)
-            )}
-        )
-    End Function
+		Return Activator.CreateInstance(
+		 connection.Statement,
+		 New Object() {sql, If(
+		  TypeOf connection.OpenedTransaction Is Transaction,
+		  DirectCast(connection.OpenedTransaction, Object),
+		  DirectCast(connection.Provider, Object)
+		 )}
+		)
+	End Function
 	''' <summary>
 	''' Create proper type of SQL statement by connection type.
 	''' </summary>
@@ -316,16 +316,16 @@ Public MustInherit Class Statement
 
 
 
-    ''' <summary>
-    ''' Set up all sql params into internal Command instance.
-    ''' </summary>
-    ''' <param name="sqlParams">Anonymous object with named keys as SQL statement params without any '@' chars in object keys.</param>
-    Protected MustOverride Sub addParamsWithValue(sqlParams As Object)
-    ''' <summary>
-    ''' Set up all sql params into internal Command instance.
-    ''' </summary>
-    ''' <param name="sqlParams">Dictionary with named keys as SQL statement params without any '@' chars in dictionary keys.</param>
-    Protected MustOverride Sub addParamsWithValue(sqlParams As Dictionary(Of String, Object))
+	''' <summary>
+	''' Set up all sql params into internal Command instance.
+	''' </summary>
+	''' <param name="sqlParams">Anonymous object with named keys as SQL statement params without any '@' chars in object keys.</param>
+	Protected MustOverride Sub addParamsWithValue(sqlParams As Object)
+	''' <summary>
+	''' Set up all sql params into internal Command instance.
+	''' </summary>
+	''' <param name="sqlParams">Dictionary with named keys as SQL statement params without any '@' chars in dictionary keys.</param>
+	Protected MustOverride Sub addParamsWithValue(sqlParams As Dictionary(Of String, Object))
 
 
 
