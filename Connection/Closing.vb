@@ -48,7 +48,7 @@ Partial Public MustInherit Class Connection
                     End If
                 Next
             Catch ex As Exception
-                Databasic.Events.RaiseError(ex, New EventArgs())
+                Databasic.Events.RaiseError(ex)
             End Try
             ' B. write lock end - to change register records under process and thread key
             Connection._registerLock.ExitWriteLock()

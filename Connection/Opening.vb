@@ -100,6 +100,11 @@ Partial Public MustInherit Class Connection
         Return Databasic.Connection.Get(Connection.GetIndexByName(connectionName))
     End Function
 
+    Protected Sub New()
+        Me.OpenedTransaction = Nothing
+        Me._connectionIndex = 0
+    End Sub
+
     ''' <summary>
     ''' Create new connection instance by connection index and returns it
     ''' </summary>
@@ -116,10 +121,10 @@ Partial Public MustInherit Class Connection
 		result = Activator.CreateInstance(connectionType)
 		Try
 			result.Open(typeAndDsn(1).Trim())
-			result._connectionIndex = connectionIndex
-		Catch ex As Exception
-			Databasic.Events.RaiseError(ex, New EventArgs())
-		End Try
+            result._connectionIndex = connectionIndex
+        Catch ex As Exception
+            Databasic.Events.RaiseError(ex)
+        End Try
 		Return result
     End Function
 

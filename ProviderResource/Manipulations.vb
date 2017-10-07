@@ -113,8 +113,8 @@
 			Dim trans As Transaction = Nothing
 			Try
 				If classMetaDescription.AutoIncrementColumn.HasValue Then
-					trans = connection.CreateAndBeginTransaction("Dtbsc.Prvdr.Rsrc.Save()")
-					result = Me.Insert(instance, trans, classMetaDescription)
+                    trans = connection.BeginTransaction("Dtbsc.Prvdr.Rsrc.Save()", IsolationLevel.Unspecified)
+                    result = Me.Insert(instance, trans, classMetaDescription)
 					lastInsertedId = Me.GetLastInsertedId(trans, classMetaDescription)
 					trans.Commit()
 					autoIncrementColName = classMetaDescription.AutoIncrementColumn.Value.CodeColumnName

@@ -41,11 +41,15 @@ Public MustInherit Class Statement
 	''' <param name="connection">Connection instance.</param>
 	''' <returns>New specificly typed SQL statement.</returns>
 	Friend Shared Function PrepareLocal(sql As String, connection As Connection) As Statement
-		Return Activator.CreateInstance(
-			connection.Statement,
-			New Object() {sql, connection.Provider}
-		)
-	End Function
+        Return Activator.CreateInstance(
+            connection.Statement,
+            New Object() {sql, If(
+                TypeOf connection.OpenedTransaction Is Transaction,
+                DirectCast(connection.OpenedTransaction, Object),
+                DirectCast(connection.Provider, Object)
+            )}
+        )
+    End Function
 	''' <summary>
 	''' Create proper type of SQL statement by connection type.
 	''' </summary>

@@ -21,8 +21,12 @@ Namespace ActiveRecord
 		Public Shared Function Table(ByRef classMetaDescription As MetaDescription, Optional tableIndex As Int32 = 0) As String
 			Dim tables As String() = classMetaDescription.Tables
 			If tableIndex < 0 OrElse tableIndex + 1 > tables.Length Then
-				Throw New Exception($"Class '{classMetaDescription.ClassType.FullName}' has not defined table in Table attribute under index '{tableIndex}'.")
-			End If
+                Throw New Exception(
+                    $"Class '{classMetaDescription.ClassType.FullName}' 
+                    has not defined table in Table attribute under index 
+                    '{tableIndex}'."
+                )
+            End If
 			Return tables(tableIndex)
 		End Function
 		''' <summary>

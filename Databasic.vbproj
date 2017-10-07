@@ -48,6 +48,7 @@
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Web" />
   </ItemGroup>
   <ItemGroup>
     <Import Include="Microsoft.VisualBasic" />
@@ -61,16 +62,30 @@
     <Import Include="System.Threading.Tasks" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ActiveRecord\Entity\DatabaseGetters\GetById.vb" />
+    <Compile Include="ActiveRecord\Entity\DatabaseGetters\GetByKey.vb" />
+    <Compile Include="ActiveRecord\Entity\DatabaseGetters\GetCount.vb" />
+    <Compile Include="ActiveRecord\Entity\DatabaseGetters\GetDictionary.vb" />
+    <Compile Include="ActiveRecord\Entity\DatabaseGetters\GetList.vb" />
+    <Compile Include="ActiveRecord\Entity\DatabaseGetters\Init.vb" />
+    <Compile Include="ActiveRecord\Entity\DatabaseReader\Privates.vb" />
+    <Compile Include="ActiveRecord\Entity\DatabaseReader\ToDictionary.vb" />
+    <Compile Include="ActiveRecord\Entity\DatabaseReader\ToList.vb" />
+    <Compile Include="ActiveRecord\Entity\DatabaseReader\ToInstance.vb" />
+    <Compile Include="ActiveRecord\Entity\InstanceGettersSetters\Getters.vb" />
+    <Compile Include="ActiveRecord\Entity\InstanceGettersSetters\Indexer.vb" />
+    <Compile Include="ActiveRecord\Entity\Manipulations\Delete.vb" />
+    <Compile Include="ActiveRecord\Entity\Manipulations\Save.vb" />
     <Compile Include="ActiveRecord\Entity\Table.vb" />
     <Compile Include="ActiveRecord\Entity\Columns.vb" />
-    <Compile Include="ActiveRecord\Entity\InstanceGettersSetters.vb" />
-    <Compile Include="ActiveRecord\Entity\Manipulations.vb" />
     <Compile Include="ActiveRecord\Resources\Columns.vb" />
     <Compile Include="Attributes\Format.vb" />
     <Compile Include="Attributes\AutoIncrement.vb" />
     <Compile Include="Attributes\Trim.vb" />
+    <Compile Include="Misc\Delegates.vb" />
     <Compile Include="Misc\Enums.vb" />
     <Compile Include="MetaDescriptor.vb" />
+    <Compile Include="Misc\Errors.vb" />
     <Compile Include="Misc\Tools.vb" />
     <Compile Include="ProviderResource\Columns.vb" />
     <Compile Include="ProviderResource\Manipulations.vb" />
@@ -89,7 +104,6 @@
     <Compile Include="Misc\Structs.vb" />
     <Compile Include="Transaction.vb" />
     <Compile Include="Connection\StaticInit.vb" />
-    <Compile Include="ActiveRecord\Entity\DatabaseGetters.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
       <AutoGen>True</AutoGen>
@@ -105,7 +119,6 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="ActiveRecord\Entity\DatabaseReader.vb" />
     <Compile Include="ActiveRecord\Resources\InstanceGetter.vb" />
     <Compile Include="Statement.vb" />
   </ItemGroup>

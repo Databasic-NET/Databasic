@@ -1,29 +1,54 @@
-﻿Imports System.Reflection
+﻿Imports Microsoft.VisualBasic.CompilerServices
+Imports System.Reflection
+Imports System.Web
+Imports System.Web.Hosting
 
 Public Class Events
 
-	''' <summary>
-	''' Custom error handler to print or log any database error.
-	''' </summary>
-	Public Shared Event [Error] As ErrorHandler
+    ''' <summary>
+    ''' Custom error handler to print or log any database error.
+    ''' </summary>
+    Public Shared Event [Error] As ErrorHandler
 
-	''' <summary>
-	''' Typed handler for catched Databasic error.
-	''' </summary>
-	''' <param name="e">Catched Exception.</param>
-	''' <param name="args">Empty event args object.</param>
-	Public Delegate Sub ErrorHandler(e As Exception, args As EventArgs)
+    Public Shared Function HasErrorHandler() As Boolean
+        Return Operators.ConditionalCompareObjectNotEqual(
+            GetType(Events).GetField(
+                "ErrorEvent",
+                BindingFlags.NonPublic Or BindingFlags.Public Or BindingFlags.Static
+            ).GetValue(Nothing),
+            Nothing,
+            False
+        )
+    End Function
 
-	Public Shared Sub RaiseError(ex As Exception, Optional args As EventArgs = Nothing)
-		If Not TypeOf args Is EventArgs Then args = New EventArgs
-		' check if Error event has any handlers, if not, thrown an exception
-		Dim fi As FieldInfo = GetType(Events).GetField("ErrorEvent", BindingFlags.Public Or BindingFlags.NonPublic Or BindingFlags.Static)
-		Dim del As Object = fi.GetValue(Nothing)
-		If del <> Nothing Then
-			RaiseEvent [Error](ex, args)
-		Else
-			Throw ex
-		End If
-	End Sub
+    Public Shared Sub RaiseError(ByVal sqlErrors As SqlErrorsCollection)
+        If Not Events.HasErrorHandler() Then
+            Throw New SqlException(sqlErrors)
+        End If
+        Dim errorEvent As ErrorHandler = Events.ErrorEvent
+        If (Not errorEvent Is Nothing) Then
+            errorEvent.Invoke(Nothing, sqlErrors)
+        End If
+    End Sub
+
+    Public Shared Sub RaiseError(ByVal ex As Exception)
+        If Not Events.HasErrorHandler() Then
+            Throw ex
+        End If
+        Dim errorEvent As ErrorHandler = Events.ErrorEvent
+        If (Not errorEvent Is Nothing) Then
+            errorEvent.Invoke(ex, Nothing)
+        End If
+    End Sub
+
+    Friend Shared Sub StaticInit()
+        If ((Operators.CompareString(HttpRuntime.AppDomainAppId, Nothing, False) > 0) And HostingEnvironment.IsHosted) Then
+            AddHandler HttpContext.Current.ApplicationInstance.Disposed, New EventHandler(AddressOf Events._webRequestDisposed)
+        End If
+    End Sub
+
+    Private Shared Sub _webRequestDisposed(ByVal sender As Object, ByVal e As EventArgs)
+        Connection.Close()
+    End Sub
 
 End Class

@@ -32,7 +32,7 @@ Partial Public MustInherit Class Connection
         Return Databasic.Connection.Get(connectionName).CreateAndBeginTransaction(transactionName, isolationLevel)
     End Function
 
-    Public Overridable Function CreateAndBeginTransaction(Optional transactionName As String = "", Optional isolationLevel As IsolationLevel = IsolationLevel.Unspecified) As Transaction
+    Protected Overridable Function createAndBeginTransaction(Optional transactionName As String = "", Optional isolationLevel As IsolationLevel = -1) As Transaction
         Return Nothing
     End Function
 
