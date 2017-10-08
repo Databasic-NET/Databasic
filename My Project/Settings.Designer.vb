@@ -39,18 +39,18 @@ Namespace My
   
   Public Shared ReadOnly Property [Default]() As MySettings
    Get
-    
+ 
 #If _MyType = "WindowsForms" Then
-      If Not addedHandler Then
-     SyncLock addedHandlerLockObject
-      If Not addedHandler Then
-       AddHandler My.Application.Shutdown, AddressOf AutoSaveSettings
-       addedHandler = True
-      End If
-     End SyncLock
-    End If
+   If Not addedHandler Then
+  SyncLock addedHandlerLockObject
+   If Not addedHandler Then
+    AddHandler My.Application.Shutdown, AddressOf AutoSaveSettings
+    addedHandler = True
+   End If
+  End SyncLock
+ End If
 #End If
-    Return defaultInstance
+ Return defaultInstance
    End Get
   End Property
  End Class
@@ -66,7 +66,7 @@ Namespace My
   <Global.System.ComponentModel.Design.HelpKeywordAttribute("My.Settings")>  _
   Friend ReadOnly Property Settings() As Global.Databasic.My.MySettings
    Get
-    Return Global.Databasic.My.MySettings.Default
+ Return Global.Databasic.My.MySettings.Default
    End Get
   End Property
  End Module

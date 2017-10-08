@@ -1003,14 +1003,14 @@ try
 				$projectPath = Get-NuSpecsAssociatedProjectFilePath -NuSpecFilePath $filePathToUse
 				if (!(Test-StringIsNullOrWhitespace $projectPath))
 				{
-     # If we are not allowed to prompt the user, just assume we should only use the .nuspec file.
-     if ($NoPrompt)
-     {
-      $answer = "No"
-     }
-     # Else prompt the user if they want to pack the project file instead.
-     else
-     {
+  # If we are not allowed to prompt the user, just assume we should only use the .nuspec file.
+  if ($NoPrompt)
+  {
+   $answer = "No"
+  }
+  # Else prompt the user if they want to pack the project file instead.
+  else
+  {
 					 $promptMessage = "The selected .nuspec file appears to be associated with the project file:`n`n$projectPath`n`nIt is generally preferred to pack the project file, and the .nuspec file will automatically get picked up.`nDo you want to pack the project file instead?"
 				
 					 # If we should prompt directly from PowerShell.
@@ -1024,7 +1024,7 @@ try
 					 {
 						 $answer = Read-MessageBoxDialog -Message $promptMessage -WindowTitle "Pack using the Project file instead?" -Buttons YesNoCancel -Icon Question
 					 }
-     }
+  }
 					
 					# If the user wants to use the Project file, use it.
 					if (($answer -is [string] -and $answer.StartsWith("Y", [System.StringComparison]::InvariantCultureIgnoreCase)) -or $answer -eq [System.Windows.Forms.DialogResult]::Yes)
@@ -1051,7 +1051,7 @@ try
    # Else if a package file was specified.
    elseif ([System.IO.Path]::GetExtension($filePathToUse) -eq ".nupkg")
    {
-    $PackageFilePath = $filePathToUse
+ $PackageFilePath = $filePathToUse
    }
 			# Else a .nuspec or package file was not specified, so assume it is a project file.
 			else
@@ -1224,7 +1224,7 @@ try
    # Make sure the Output Directory we are adding exists.
    if (!(Test-Path -Path $defaultDirectoryPathToPutNuGetPackageIn))
    {
-    New-Item -Path $defaultDirectoryPathToPutNuGetPackageIn -ItemType Directory > $null
+ New-Item -Path $defaultDirectoryPathToPutNuGetPackageIn -ItemType Directory > $null
    }
 	 }
 
@@ -1320,7 +1320,7 @@ try
    # If the user does not have an API key saved on this PC for the Source to push to, and prompts are allowed, prompt them for one.
    if (((Get-XmlNodes -XmlDocument $nuGetConfigXml -NodePath "configuration.apikeys.add" | Where-Object { $_.key -eq $sourceToPushPackageTo }) -eq $null) -and !$NoPrompt)
    {
-    $promptMessage = "It appears that you do not have an API key saved on this PC for the source to push the package to '$sourceToPushPackageTo'.`n`nYou must provide an API key to push this package to the NuGet Gallery.`n`nPlease enter your API key"
+ $promptMessage = "It appears that you do not have an API key saved on this PC for the source to push the package to '$sourceToPushPackageTo'.`n`nYou must provide an API key to push this package to the NuGet Gallery.`n`nPlease enter your API key"
 		
 		  # If we should prompt directly from PowerShell.
 		  if ($UsePowerShellPrompts)
@@ -1334,14 +1334,14 @@ try
 		  }
 		
 		  # If the user supplied an Api Key.
-    if (!(Test-StringIsNullOrWhitespace $apiKey))
-    {
-     # Add the given Api Key to the Push Options.
-     $PushOptions += " -ApiKey $apiKey"
+ if (!(Test-StringIsNullOrWhitespace $apiKey))
+ {
+  # Add the given Api Key to the Push Options.
+  $PushOptions += " -ApiKey $apiKey"
 
-     # Record that the user provided the Api Key via a prompt.
-     $UserProvidedApiKeyUsingPrompt = $true
-    }
+  # Record that the user provided the Api Key via a prompt.
+  $UserProvidedApiKeyUsingPrompt = $true
+ }
    }
   }
 
@@ -1372,12 +1372,12 @@ try
    # If the package was output to the default directory, and the directory is now empty, delete the default directory too since we would have created it above.
    if (!(Test-StringIsNullOrWhitespace $defaultDirectoryPathToPutNuGetPackageIn) -and (Test-Path -Path $defaultDirectoryPathToPutNuGetPackageIn))
    {
-    [int]$numberOfFilesInDefaultOutputDirectory = ((Get-ChildItem -Path $defaultDirectoryPathToPutNuGetPackageIn -Force) | Measure-Object).Count
-    if ((Split-Path -Path $nuGetPackageFilePath -Parent) -eq $defaultDirectoryPathToPutNuGetPackageIn -and $numberOfFilesInDefaultOutputDirectory -eq 0)
-    {
-     Write-Verbose "Deleting empty default NuGet package directory '$defaultDirectoryPathToPutNuGetPackageIn'."
-     Remove-Item -Path $defaultDirectoryPathToPutNuGetPackageIn -Force
-    }
+ [int]$numberOfFilesInDefaultOutputDirectory = ((Get-ChildItem -Path $defaultDirectoryPathToPutNuGetPackageIn -Force) | Measure-Object).Count
+ if ((Split-Path -Path $nuGetPackageFilePath -Parent) -eq $defaultDirectoryPathToPutNuGetPackageIn -and $numberOfFilesInDefaultOutputDirectory -eq 0)
+ {
+  Write-Verbose "Deleting empty default NuGet package directory '$defaultDirectoryPathToPutNuGetPackageIn'."
+  Remove-Item -Path $defaultDirectoryPathToPutNuGetPackageIn -Force
+ }
    }
   }
 
@@ -1387,7 +1387,7 @@ try
 	  # If we are not allowed to prompt the user, just assume they don't want to save the key on this PC.
    if ($NoPrompt)
    {
-    $answer = "No"
+ $answer = "No"
    }
    # Else prompt the user if they want to save the given API key on this PC.
    else
@@ -1422,11 +1422,11 @@ try
 				Write-Verbose $setApiKeyOutput
 				
 				# Determine if the API Key was saved successfully, and throw an error if it wasn't.
-    $expectedSuccessfulNuGetSetApiKeyOutput = ($NUGET_EXE_SUCCESSFULLY_SAVED_API_KEY_MESSAGE -f $apiKey, $sourceToPushPackageTo)	# "The API Key '$apiKey' was saved for '$sourceToPushPackageTo'."
-    if ($setApiKeyOutput -ne $expectedSuccessfulNuGetSetApiKeyOutput.Trim())
-    {
-     throw "Could not determine if the API key was saved successfully. Perhaps an error occurred while saving it. Look for errors from NuGet.exe above (in the console window), or in the following NuGet.exe output. You can also try running this command with the -Verbose switch for more information:{0}{1}" -f [Environment]::NewLine, $packOutput
-    }
+ $expectedSuccessfulNuGetSetApiKeyOutput = ($NUGET_EXE_SUCCESSFULLY_SAVED_API_KEY_MESSAGE -f $apiKey, $sourceToPushPackageTo)	# "The API Key '$apiKey' was saved for '$sourceToPushPackageTo'."
+ if ($setApiKeyOutput -ne $expectedSuccessfulNuGetSetApiKeyOutput.Trim())
+ {
+  throw "Could not determine if the API key was saved successfully. Perhaps an error occurred while saving it. Look for errors from NuGet.exe above (in the console window), or in the following NuGet.exe output. You can also try running this command with the -Verbose switch for more information:{0}{1}" -f [Environment]::NewLine, $packOutput
+ }
 			}
   }
 	}

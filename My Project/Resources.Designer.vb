@@ -38,11 +38,11 @@ Namespace My.Resources
   <Global.System.ComponentModel.EditorBrowsableAttribute(Global.System.ComponentModel.EditorBrowsableState.Advanced)>  _
   Friend ReadOnly Property ResourceManager() As Global.System.Resources.ResourceManager
    Get
-    If Object.ReferenceEquals(resourceMan, Nothing) Then
-     Dim temp As Global.System.Resources.ResourceManager = New Global.System.Resources.ResourceManager("Databasic.Resources", GetType(Resources).Assembly)
-     resourceMan = temp
-    End If
-    Return resourceMan
+ If Object.ReferenceEquals(resourceMan, Nothing) Then
+  Dim temp As Global.System.Resources.ResourceManager = New Global.System.Resources.ResourceManager("Databasic.Resources", GetType(Resources).Assembly)
+  resourceMan = temp
+ End If
+ Return resourceMan
    End Get
   End Property
   
@@ -53,10 +53,10 @@ Namespace My.Resources
   <Global.System.ComponentModel.EditorBrowsableAttribute(Global.System.ComponentModel.EditorBrowsableState.Advanced)>  _
   Friend Property Culture() As Global.System.Globalization.CultureInfo
    Get
-    Return resourceCulture
+ Return resourceCulture
    End Get
    Set
-    resourceCulture = value
+ resourceCulture = value
    End Set
   End Property
  End Module

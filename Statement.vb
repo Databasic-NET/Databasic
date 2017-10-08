@@ -99,26 +99,40 @@ Public MustInherit Class Statement
 	Public Shared Function Prepare(sql As String, connection As Connection) As Statement
 		Return Statement.PrepareLocal(sql, connection)
 	End Function
-	''' <summary>
-	''' Create and prepare database SQL statement. Put '@' char before all param names in your SQL code.
-	''' Created database statement will be executed in passed transaction.
-	''' </summary>
-	''' <param name="sql">SQL code for statement. Put '@' char before all param names in your SQL code.</param>
-	''' <param name="transaction">Database transaction from current connection to execute this SQL statement inside.</param>
-	''' <returns>New specificly typed SQL statement by connection.</returns>
-	Public Shared Function Prepare(sql As String, transaction As Transaction) As Statement
-		Return Statement.PrepareLocal(sql, transaction)
-	End Function
+ ''' <summary>
+ ''' Create and prepare database SQL statement. Put '@' char before all param names in your SQL code.
+ ''' Created database statement will be executed in passed transaction.
+ ''' </summary>
+ ''' <param name="sql">SQL code for statement. Put '@' char before all param names in your SQL code.</param>
+ ''' <param name="transaction">Database transaction from current connection to execute this SQL statement inside.</param>
+ ''' <returns>New specificly typed SQL statement by connection.</returns>
+ Public Shared Function Prepare(sql As String, transaction As Transaction) As Statement
+  Return Statement.PrepareLocal(sql, transaction)
+ End Function
+ ''' <summary>
+ ''' Create and prepare database SQL statement. Put '@' char before all param names in your SQL code.
+ ''' Created database statement will be executed in passed transaction.
+ ''' </summary>
+ ''' <param name="sql">SQL code for statement. Put '@' char before all param names in your SQL code.</param>
+ ''' <param name="connectionOrTransaction">Database connection or database transaction from current connection to execute this SQL statement inside.</param>
+ ''' <returns>New specificly typed SQL statement by connection.</returns>
+ Public Shared Function Prepare(sql As String, connectionOrTransaction As Object) As Statement
+  If TypeOf connectionOrTransaction Is Databasic.Connection Then
+   Return Statement.PrepareLocal(sql, DirectCast(connectionOrTransaction, Databasic.Connection))
+  Else
+   Return Statement.PrepareLocal(sql, DirectCast(connectionOrTransaction, Databasic.Transaction))
+  End If
+ End Function
 
 
 
 
 
-	''' <summary>
-	''' Execute SQL statement and open data reader to get only first single row from select statement result.
-	''' </summary>
-	''' <returns>SQL statement instance with opened data reader.</returns>
-	Public Function FetchOne() As Statement
+ ''' <summary>
+ ''' Execute SQL statement and open data reader to get only first single row from select statement result.
+ ''' </summary>
+ ''' <returns>SQL statement instance with opened data reader.</returns>
+ Public Function FetchOne() As Statement
 		Try
 			Me.Reader = Me.Command.ExecuteReader(CommandBehavior.SingleRow)
 		Catch ex As Exception
