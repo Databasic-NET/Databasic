@@ -9,6 +9,13 @@
 - arranging data into primitive types, typed active record classes, collections and more
 - allowing to run any nonselect queries
 
+Databasic packages:
+- Microsoft SQL
+- MySql
+- PostgreSql
+- SQLite
+- OracleSql (in progress)
+
 ## Instalation
 **This is core package only**. Install this package only by installing specific database package like: Databasic.&#60;DatabaseType&#62;. Then this package will be installed automaticly with the specific database package.
 ```nuget
