@@ -19,13 +19,9 @@ Databasic packages:
 ## Instalation
 **This is core package only**. Install this package only by installing specific database package like: Databasic.&#60;DatabaseType&#62;. Then this package will be installed automaticly with the specific database package.
 ```nuget
-PM> Install-Package Databasic.MsSql
+PM> Install-Package Databasic.DatabaseType
 ```
-Or:
-```nuget
-PM> Install-Package Databasic.MySql
-```
-Or both of them if you wana to use more databases simultaneously.
+(database types: MsSql, MySql, PostgreSql, SQLite, OracleSql)
 
 
 
