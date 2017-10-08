@@ -54,6 +54,7 @@ Partial Public MustInherit Class Connection
 				processAndThreadLock.ExitUpgradeableReadLock()
 				' create new connection record
 				connection = Databasic.Connection._createAndOpen(connectionIndex.Value)
+				processAndThreadConnections.Add(connectionIndex.Value, connection)
 				' D. write lock end - to change process and thread record under called index
 				processAndThreadLock.ExitWriteLock()
 			End If
@@ -92,6 +93,7 @@ Partial Public MustInherit Class Connection
 				processAndThreadLock.ExitUpgradeableReadLock()
 				' create new connection record
 				connection = Databasic.Connection._createAndOpen(connectionIndex.Value)
+				processAndThreadConnections.Add(connectionIndex.Value, connection)
 				' D. write lock end - to change process and thread record under called index
 				processAndThreadLock.ExitWriteLock()
 			End If
