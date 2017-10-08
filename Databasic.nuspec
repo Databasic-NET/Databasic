@@ -1,28 +1,28 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
-	<metadata minClientVersion="2.6">
-		<id>Databasic.Core</id>
-		<version>1.1.0.0</version>
-		<title>Databasic - Core Package</title>
-		<authors>Tom Flidr</authors>
-		<owners>Tom Flidr</owners>
-		<licenseUrl>https://opensource.org/licenses/BSD-3-Clause</licenseUrl>
-		<projectUrl>https://github.com/databasic-net</projectUrl>
-		<iconUrl>https://raw.githubusercontent.com/databasic-net/databasic/master/gfx/databasic-icon.ico</iconUrl>
-		<language>en-US</language>
-		<requireLicenseAcceptance>false</requireLicenseAcceptance>
-		<description>
-   C#/VB.NET database utility to write pure Microsoft SQL/MySQL queries and load data into environment variables and instances.
-   This is core package only. Install this package only by installing specific database package like: Databasic.&#60;DatabaseType&#62;. Then this package will be installed automaticly with the specific database package.
- </description>
-		<copyright>Copyright ©	2017</copyright>
- <tags>microsoft sql mssql tsql database query command select insert update delete dml tool utility</tags>
-		<dependencies>
-   <!--dependency id="System" version="4.0.0.0" />
-   <dependency id="System.Core" version="4.0.0.0" />
-   <dependency id="System.Data" version="4.0.0.0" />
-   <dependency id="System.Configuration" version="4.0.0.0" /-->
-		</dependencies>
-		<releaseNotes>https://github.com/databasic-net/databasic/releases</releaseNotes>
-	</metadata>
+  <metadata minClientVersion="2.6">
+    <id>Databasic.Core</id>
+    <version>1.1.0.0</version>
+    <title>Databasic - Core Package</title>
+    <authors>Tom Flidr</authors>
+    <owners>Tom Flidr</owners>
+    <licenseUrl>https://opensource.org/licenses/BSD-3-Clause</licenseUrl>
+    <projectUrl>https://github.com/databasic-net</projectUrl>
+    <iconUrl>https://raw.githubusercontent.com/databasic-net/databasic/master/gfx/databasic-icon.ico</iconUrl>
+    <language>en-US</language>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>
+      C#/VB.NET database utility to write pure Microsoft SQL/MySQL/PgSql/Oracle/SQLite queries and load data into environment variables and instances.
+      This is core package only. Install this package only by installing specific database package like: Databasic.&#60;DatabaseType&#62;. Then this package will be installed automaticly with the specific database package.
+    </description>
+    <copyright>Copyright ©	2017</copyright>
+    <tags>microsoft sql mssql postgres oracle sqlite tsql mssql database query command select insert update delete dml tool utility</tags>
+    <dependencies>
+      <!--dependency id="System" version="4.0.0.0" />
+      <dependency id="System.Core" version="4.0.0.0" />
+      <dependency id="System.Data" version="4.0.0.0" />
+      <dependency id="System.Configuration" version="4.0.0.0" /-->
+    </dependencies>
+    <releaseNotes>https://github.com/databasic-net/databasic/releases</releaseNotes>
+  </metadata>
 </package>
