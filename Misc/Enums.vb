@@ -32,6 +32,7 @@ Public Enum DuplicateKeyBehaviour
 End Enum
 
 Public Enum MemberInfoType
-	Prop
-	Field
+    None
+    Prop
+    Field
 End Enum

@@ -18,7 +18,7 @@ Namespace ActiveRecord
 			Optional memberNames As List(Of String) = Nothing,
 			Optional keysByCode As Boolean = False,
 			Optional asInitialData As Boolean = False,
-			Optional ByRef classMembersInfo As Dictionary(Of String, Databasic.MemberInfo) = Nothing
+			Optional classMembersInfo As Dictionary(Of String, Databasic.MemberInfo) = Nothing
 		) As Dictionary(Of String, Object)
 			Dim result As New Dictionary(Of String, Object)
 			If asInitialData Then
@@ -96,7 +96,7 @@ Namespace ActiveRecord
 		''' <returns>Dictionary with values, which are different from initial set up.</returns>
 		Public Function GetTouched(
 			Optional keysByCode As Boolean = False,
-			Optional ByRef classMembersInfo As Dictionary(Of String, Databasic.MemberInfo) = Nothing
+			Optional classMembersInfo As Dictionary(Of String, Databasic.MemberInfo) = Nothing
 		) As Dictionary(Of String, Object)
 			Dim touched As New Dictionary(Of String, Object)
 			Dim initialValue As Object

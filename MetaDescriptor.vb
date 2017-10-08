@@ -229,19 +229,21 @@ Public Class MetaDescriptor
 			End If
 			formatProvider = If(TypeOf formatAttr Is FormatAttribute, formatAttr.FormatProvider, Nothing)
 			trimChars = If(TypeOf trimAttr Is TrimAttribute, trimAttr.Chars, New Char() {})
-			' complete code column names and db column names collections
-			result.ColumnsByCodeNames.Add(codeColumnName, New Databasic.MemberInfo With {
-				.Name = dbColumnName,
-				.MemberInfo = reflMemberInfo, .Type = item.Value.Type,
-				.FormatProvider = formatProvider, .TrimChars = trimChars
-			})
-			result.ColumnsByDatabaseNames.Add(dbColumnName, New Databasic.MemberInfo With {
-				.Name = codeColumnName,
-				.MemberInfo = reflMemberInfo, .Type = item.Value.Type,
-				.FormatProvider = formatProvider, .TrimChars = trimChars
-			})
-			' if there is any key info at class element, add it into keys info collections
-			If TypeOf primaryKeyAttr Is PrimaryKeyAttribute Then
+            ' complete code column names and db column names collections
+            result.ColumnsByCodeNames.Add(codeColumnName, New Databasic.MemberInfo With {
+                .Name = dbColumnName,
+                .MemberInfo = reflMemberInfo, .Type = item.Value.Type,
+                .FormatProvider = formatProvider, .TrimChars = trimChars,
+                .MemberInfoType = item.Value.MemberInfoType, .Value = Nothing
+            })
+            result.ColumnsByDatabaseNames.Add(dbColumnName, New Databasic.MemberInfo With {
+                .Name = codeColumnName,
+                .MemberInfo = reflMemberInfo, .Type = item.Value.Type,
+                .FormatProvider = formatProvider, .TrimChars = trimChars,
+                .MemberInfoType = item.Value.MemberInfoType, .Value = Nothing
+            })
+            ' if there is any key info at class element, add it into keys info collections
+            If TypeOf primaryKeyAttr Is PrimaryKeyAttribute Then
 				If Not String.IsNullOrEmpty(primaryKeyAttr.KeyName) Then keyName = primaryKeyAttr.KeyName
 				If result.PrimaryColumns.ContainsKey(keyName) Then
 					result.PrimaryColumns(keyName).Add(codeColumnName, dbColumnName)
