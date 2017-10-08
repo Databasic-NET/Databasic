@@ -28,74 +28,23 @@ Partial Public MustInherit Class Connection
 		End If
 		Dim connection As Databasic.Connection = Nothing
 		Dim processAndThreadKey As String = Databasic.Connection._getProcessAndThreadKey()
-		Dim processAndThreadLock As ReaderWriterLockSlim
 		Dim processAndThreadConnections As Dictionary(Of Int32, Connection)
-		' A. read check begin - if register contains any connection records under process and thread key
-		Databasic.Connection._registerLock.EnterUpgradeableReadLock()
-		' check if register contains any connection records under process and thread key
-		If Databasic.Connection._connectionsRegister.ContainsKey(processAndThreadKey) Then
-			' register contains any connection records under process and thread key - fill local variables to use them later
-			processAndThreadLock = Databasic.Connection._registerLocks(processAndThreadKey)
-			processAndThreadConnections = Databasic.Connection._connectionsRegister(processAndThreadKey)
 
-			' C. read check begin - if process and thread record contains connection under called index
-			processAndThreadLock.EnterUpgradeableReadLock()
-			' check if process and thread record contains connection under called index
-			If processAndThreadConnections.ContainsKey(connectionIndex.Value) Then
-				' process and thread record contains connection under called index - let's read connection record
-				connection = processAndThreadConnections(connectionIndex.Value)
-				' C. read check end - if process and thread record contains connection under called index
-				processAndThreadLock.ExitUpgradeableReadLock()
+		SyncLock Databasic.Connection._registerLock
+			If Databasic.Connection._connectionsRegister.ContainsKey(processAndThreadKey) Then
+				processAndThreadConnections = Databasic.Connection._connectionsRegister(processAndThreadKey)
 			Else
-				' process and thread record doesn't contain connection under called index - let's create new connection record
-				' D. write lock begin - to change process and thread record under called index
-				processAndThreadLock.EnterWriteLock()
-				' C. read check end - if process and thread record contains connection under called index
-				processAndThreadLock.ExitUpgradeableReadLock()
-				' create new connection record
-				connection = Databasic.Connection._createAndOpen(connectionIndex.Value)
-				' D. write lock end - to change process and thread record under called index
-				processAndThreadLock.ExitWriteLock()
+				processAndThreadConnections = New Dictionary(Of Int32, Connection)()
+				Databasic.Connection._connectionsRegister.Add(processAndThreadKey, processAndThreadConnections)
 			End If
-
-			' A. read check end - if register contains any connection records under process and thread key
-			Databasic.Connection._registerLock.ExitUpgradeableReadLock()
-		Else
-			' register doesn't contain any connection records under process and thread key
-			' B. write lock begin - to change register records under process and thread key
-			Databasic.Connection._registerLock.EnterWriteLock()
-			' A. read check end - if register contains any connection records under process and thread key
-			Databasic.Connection._registerLock.ExitUpgradeableReadLock()
-			processAndThreadLock = New ReaderWriterLockSlim()
-
-			' lets change the register - add connection records under thread and process key
-			processAndThreadConnections = New Dictionary(Of Int32, Connection)()
-			Databasic.Connection._registerLocks.Add(processAndThreadKey, processAndThreadLock)
-			Databasic.Connection._connectionsRegister.Add(processAndThreadKey, processAndThreadConnections)
-
-			' B. write lock end - to change register records under process and thread key
-			Databasic.Connection._registerLock.ExitWriteLock()
-
-			' C. read check begin - if process and thread record contains connection under called index
-			processAndThreadLock.EnterUpgradeableReadLock()
-			' check if process and thread record contains connection under called index
 			If processAndThreadConnections.ContainsKey(connectionIndex.Value) Then
-				' process and thread record contains connection under called index - let's read connection record
 				connection = processAndThreadConnections(connectionIndex.Value)
-				' C. read check end - if process and thread record contains connection under called index
-				processAndThreadLock.ExitUpgradeableReadLock()
 			Else
-				' process and thread record doesn't contain connection under called index - let's create new connection record
-				' D. write lock begin - to change process and thread record under called index
-				processAndThreadLock.EnterWriteLock()
-				' C. read check end - if process and thread record contains connection under called index
-				processAndThreadLock.ExitUpgradeableReadLock()
-				' create new connection record
 				connection = Databasic.Connection._createAndOpen(connectionIndex.Value)
-				' D. write lock end - to change process and thread record under called index
-				processAndThreadLock.ExitWriteLock()
+				processAndThreadConnections.Add(connectionIndex.Value, connection)
 			End If
-		End If
+		End SyncLock
+
 		Return connection
 	End Function
 

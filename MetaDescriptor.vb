@@ -5,7 +5,7 @@ Imports Databasic
 
 Public Class MetaDescriptor
 
-	Private Shared _lock As ReaderWriterLockSlim = New ReaderWriterLockSlim()
+	Private Shared _lock As Object = New Object()
 	Private Shared _register As New Dictionary(Of String, MetaDescription)
 
 	Friend Shared Function GetIndexerPropertyName(Type As Type) As String
@@ -22,17 +22,14 @@ Public Class MetaDescriptor
 	Friend Shared Function GetClassDescription(type As Type) As MetaDescription
 		Dim result As MetaDescription = Nothing
 		Dim key As String = type.Assembly.GetName().Name + ":" + type.FullName
-		MetaDescriptor._lock.EnterUpgradeableReadLock()
-		If MetaDescriptor._register.ContainsKey(key) Then
-			result = MetaDescriptor._register(key)
-			MetaDescriptor._lock.ExitUpgradeableReadLock()
-		Else
-			MetaDescriptor._lock.EnterWriteLock()
-			MetaDescriptor._lock.ExitUpgradeableReadLock()
-			result = MetaDescriptor._completeMetaDescription(type)
-			MetaDescriptor._register.Add(key, result)
-			MetaDescriptor._lock.ExitWriteLock()
-		End If
+		SyncLock MetaDescriptor._lock
+			If MetaDescriptor._register.ContainsKey(key) Then
+				result = MetaDescriptor._register(key)
+			Else
+				result = MetaDescriptor._completeMetaDescription(type)
+				MetaDescriptor._register.Add(key, result)
+			End If
+		End SyncLock
 		Return result
 	End Function
 
@@ -41,24 +38,21 @@ Public Class MetaDescriptor
 		Dim members As Dictionary(Of String, Databasic.MemberInfo)
 		Dim meta As MetaDescription
 		Dim key As String = type.Assembly.GetName().Name + ":" + type.FullName
-		MetaDescriptor._lock.EnterUpgradeableReadLock()
-		If MetaDescriptor._register.ContainsKey(key) Then
-			members = MetaDescriptor._register(key).ColumnsByCodeNames
-			If members.ContainsKey(codeColumnName) Then
-				result = members(codeColumnName)
+		SyncLock MetaDescriptor._lock
+			If MetaDescriptor._register.ContainsKey(key) Then
+				members = MetaDescriptor._register(key).ColumnsByCodeNames
+				If members.ContainsKey(codeColumnName) Then
+					result = members(codeColumnName)
+				End If
+			Else
+				meta = MetaDescriptor._completeMetaDescription(type)
+				MetaDescriptor._register.Add(key, meta)
+				members = meta.ColumnsByCodeNames
+				If members.ContainsKey(codeColumnName) Then
+					result = members(codeColumnName)
+				End If
 			End If
-			MetaDescriptor._lock.ExitUpgradeableReadLock()
-		Else
-			MetaDescriptor._lock.EnterWriteLock()
-			MetaDescriptor._lock.ExitUpgradeableReadLock()
-			meta = MetaDescriptor._completeMetaDescription(type)
-			MetaDescriptor._register.Add(key, meta)
-			members = meta.ColumnsByCodeNames
-			If members.ContainsKey(codeColumnName) Then
-				result = members(codeColumnName)
-			End If
-			MetaDescriptor._lock.ExitWriteLock()
-		End If
+		End SyncLock
 		Return result
 	End Function
 
@@ -66,18 +60,15 @@ Public Class MetaDescriptor
 		Dim result As Dictionary(Of String, Databasic.MemberInfo)
 		Dim meta As MetaDescription
 		Dim key As String = type.Assembly.GetName().Name + ":" + type.FullName
-		MetaDescriptor._lock.EnterUpgradeableReadLock()
-		If MetaDescriptor._register.ContainsKey(key) Then
-			result = MetaDescriptor._register(key).ColumnsByDatabaseNames
-			MetaDescriptor._lock.ExitUpgradeableReadLock()
-		Else
-			MetaDescriptor._lock.EnterWriteLock()
-			MetaDescriptor._lock.ExitUpgradeableReadLock()
-			meta = MetaDescriptor._completeMetaDescription(type)
-			MetaDescriptor._register.Add(key, meta)
-			result = meta.ColumnsByDatabaseNames
-			MetaDescriptor._lock.ExitWriteLock()
-		End If
+		SyncLock MetaDescriptor._lock
+			If MetaDescriptor._register.ContainsKey(key) Then
+				result = MetaDescriptor._register(key).ColumnsByDatabaseNames
+			Else
+				meta = MetaDescriptor._completeMetaDescription(type)
+				MetaDescriptor._register.Add(key, meta)
+				result = meta.ColumnsByDatabaseNames
+			End If
+		End SyncLock
 		Return result
 	End Function
 
@@ -85,18 +76,15 @@ Public Class MetaDescriptor
 		Dim result As Dictionary(Of String, Databasic.MemberInfo)
 		Dim meta As MetaDescription
 		Dim key As String = type.Assembly.GetName().Name + ":" + type.FullName
-		MetaDescriptor._lock.EnterUpgradeableReadLock()
-		If MetaDescriptor._register.ContainsKey(key) Then
-			result = MetaDescriptor._register(key).ColumnsByCodeNames
-			MetaDescriptor._lock.ExitUpgradeableReadLock()
-		Else
-			MetaDescriptor._lock.EnterWriteLock()
-			MetaDescriptor._lock.ExitUpgradeableReadLock()
-			meta = MetaDescriptor._completeMetaDescription(type)
-			MetaDescriptor._register.Add(key, meta)
-			result = meta.ColumnsByCodeNames
-			MetaDescriptor._lock.ExitWriteLock()
-		End If
+		SyncLock MetaDescriptor._lock
+			If MetaDescriptor._register.ContainsKey(key) Then
+				result = MetaDescriptor._register(key).ColumnsByCodeNames
+			Else
+				meta = MetaDescriptor._completeMetaDescription(type)
+				MetaDescriptor._register.Add(key, meta)
+				result = meta.ColumnsByCodeNames
+			End If
+		End SyncLock
 		Return result
 	End Function
 
@@ -104,23 +92,20 @@ Public Class MetaDescriptor
 		Dim result As AllKeyColumns = New AllKeyColumns
 		Dim meta As MetaDescription
 		Dim key As String = type.Assembly.GetName().Name + ":" + type.FullName
-		MetaDescriptor._lock.EnterUpgradeableReadLock()
-		If MetaDescriptor._register.ContainsKey(key) Then
-			meta = MetaDescriptor._register(key)
-			result.PrimaryColumns = meta.PrimaryColumns
-			result.UniqueColumns = meta.UniqueColumns
-			result.AutoIncrementColumn = meta.AutoIncrementColumn
-			MetaDescriptor._lock.ExitUpgradeableReadLock()
-		Else
-			MetaDescriptor._lock.EnterWriteLock()
-			MetaDescriptor._lock.ExitUpgradeableReadLock()
-			meta = MetaDescriptor._completeMetaDescription(type)
-			MetaDescriptor._register.Add(key, meta)
-			result.PrimaryColumns = meta.PrimaryColumns
-			result.UniqueColumns = meta.UniqueColumns
-			result.AutoIncrementColumn = meta.AutoIncrementColumn
-			MetaDescriptor._lock.ExitWriteLock()
-		End If
+		SyncLock MetaDescriptor._lock
+			If MetaDescriptor._register.ContainsKey(key) Then
+				meta = MetaDescriptor._register(key)
+				result.PrimaryColumns = meta.PrimaryColumns
+				result.UniqueColumns = meta.UniqueColumns
+				result.AutoIncrementColumn = meta.AutoIncrementColumn
+			Else
+				meta = MetaDescriptor._completeMetaDescription(type)
+				MetaDescriptor._register.Add(key, meta)
+				result.PrimaryColumns = meta.PrimaryColumns
+				result.UniqueColumns = meta.UniqueColumns
+				result.AutoIncrementColumn = meta.AutoIncrementColumn
+			End If
+		End SyncLock
 		Return result
 	End Function
 
@@ -128,29 +113,26 @@ Public Class MetaDescriptor
 		Dim result As AllKeyColumns = New AllKeyColumns
 		Dim meta As MetaDescription
 		Dim key As String = type.Assembly.GetName().Name + ":" + type.FullName
-		MetaDescriptor._lock.EnterUpgradeableReadLock()
-		If MetaDescriptor._register.ContainsKey(key) Then
-			meta = MetaDescriptor._register(key)
-			If keyType = KeyType.Primary Then
-				result.PrimaryColumns = meta.PrimaryColumns
+		SyncLock MetaDescriptor._lock
+			If MetaDescriptor._register.ContainsKey(key) Then
+				meta = MetaDescriptor._register(key)
+				If keyType = KeyType.Primary Then
+					result.PrimaryColumns = meta.PrimaryColumns
+				Else
+					result.UniqueColumns = meta.UniqueColumns
+				End If
+				result.AutoIncrementColumn = meta.AutoIncrementColumn
 			Else
-				result.UniqueColumns = meta.UniqueColumns
+				meta = MetaDescriptor._completeMetaDescription(type)
+				MetaDescriptor._register.Add(key, meta)
+				If keyType = KeyType.Primary Then
+					result.PrimaryColumns = meta.PrimaryColumns
+				Else
+					result.UniqueColumns = meta.UniqueColumns
+				End If
+				result.AutoIncrementColumn = meta.AutoIncrementColumn
 			End If
-			result.AutoIncrementColumn = meta.AutoIncrementColumn
-			MetaDescriptor._lock.ExitUpgradeableReadLock()
-		Else
-			MetaDescriptor._lock.EnterWriteLock()
-			MetaDescriptor._lock.ExitUpgradeableReadLock()
-			meta = MetaDescriptor._completeMetaDescription(type)
-			MetaDescriptor._register.Add(key, meta)
-			If keyType = KeyType.Primary Then
-				result.PrimaryColumns = meta.PrimaryColumns
-			Else
-				result.UniqueColumns = meta.UniqueColumns
-			End If
-			result.AutoIncrementColumn = meta.AutoIncrementColumn
-			MetaDescriptor._lock.ExitWriteLock()
-		End If
+		End SyncLock
 		Return result
 	End Function
 
