@@ -59,7 +59,7 @@ Partial Public MustInherit Class Connection
 	''' <summary>
 	''' Threads semahore to read/write into managed connections store.
 	''' </summary>
-	Private Shared _staticInitDoneLock As New ReaderWriterLockSlim()
+	Private Shared _staticInitDoneLock As New Object
 	''' <summary>
 	''' True if static initialization completed, nothing else.
 	''' </summary>
@@ -82,10 +82,10 @@ Partial Public MustInherit Class Connection
 	''' </summary>
 	''' <param name="connectionName">Connection name dictionary key.</param>
 	''' <returns>Config connection index (sequence index).</returns>
-	Friend Shared Function GetIndexByName(connectionName As String) As Int32
+	Friend Shared Function GetIndexByName(connectionName As String, Optional throwException As Boolean = True) As Int32?
 		If Databasic.Connection.NamesAndIndexes.ContainsKey(connectionName) Then
 			Return Databasic.Connection.NamesAndIndexes(connectionName)
-		Else
+		ElseIf throwException Then
 			Events.RaiseError(New Exception(
 				$"Connection settings under name doesn't exist: {connectionName}."
 			))

@@ -10,7 +10,7 @@
 	Public Sub New(ByVal configConnectionName As String)
 		Me.ConnectionIndex = 0
 		If Not String.IsNullOrEmpty(configConnectionName) Then
-			Me.ConnectionIndex = Connection.GetIndexByName(configConnectionName)
+			Me.ConnectionIndex = Connection.GetIndexByName(configConnectionName).Value
 		End If
 	End Sub
 End Class

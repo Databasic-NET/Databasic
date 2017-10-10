@@ -85,6 +85,7 @@
     <Compile Include="Attributes\Format.vb" />
     <Compile Include="Attributes\AutoIncrement.vb" />
     <Compile Include="Attributes\Trim.vb" />
+    <Compile Include="Connection\Register.vb" />
     <Compile Include="Misc\Delegates.vb" />
     <Compile Include="Misc\Enums.vb" />
     <Compile Include="MetaDescriptor.vb" />

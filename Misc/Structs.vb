@@ -57,3 +57,14 @@ Friend Structure Constants
 	Friend Shared UniqueKeyAttrType As Type = GetType(UniqueKeyAttribute)
 	Friend Shared AutoIncrementAttrType As Type = GetType(AutoIncrementAttribute)
 End Structure
+
+Friend Structure ProviderNames
+	Friend Shared Values As Dictionary(Of ProviderName, String) = New Dictionary(Of ProviderName, String) From {
+		{ProviderName.MsSql, "System.Data.SqlClient"},
+		{ProviderName.MySql, "MySql.Data.MySqlClient"},
+		{ProviderName.ODBC, "System.Data.Odbc"},
+		{ProviderName.OracleSql, "Oracle.DataAccess.Client"},
+		{ProviderName.PostgreSQL, "Npgsql"},
+		{ProviderName.SQLite, "System.Data.SQLite"}
+	}
+End Structure

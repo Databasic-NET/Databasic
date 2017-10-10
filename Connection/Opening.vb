@@ -107,7 +107,7 @@ Partial Public MustInherit Class Connection
 	''' <param name="connectionName">Config connection name.</param>
 	''' <returns></returns>
 	Public Shared Function [Get](connectionName As String) As Connection
-		Return Databasic.Connection.Get(Connection.GetIndexByName(connectionName))
+		Return Databasic.Connection.Get(Connection.GetIndexByName(connectionName).Value)
 	End Function
 
 	''' <summary>

@@ -32,7 +32,34 @@ Public Enum DuplicateKeyBehaviour
 End Enum
 
 Public Enum MemberInfoType
-    None
-    Prop
-    Field
+	None
+	Prop
+	Field
+End Enum
+
+Public Enum ProviderName
+	''' <summary>
+	''' Microsoft SQL server - System.Data.SqlClient
+	''' </summary>
+	MsSql
+	''' <summary>
+	''' MariaDB/MySQL server - MySql.Data.MySqlClient
+	''' </summary>
+	MySql
+	''' <summary>
+	''' ODBC server - System.Data.Odbc
+	''' </summary>
+	ODBC
+	''' <summary>
+	''' Oracle server - Oracle.DataAccess.Client
+	''' </summary>
+	OracleSql
+	''' <summary>
+	''' PostreSql server - Npgsql
+	''' </summary>
+	PostgreSQL
+	''' <summary>
+	''' SQLite database - System.Data.SQLite
+	''' </summary>
+	SQLite
 End Enum
