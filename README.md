@@ -9,21 +9,29 @@
 - arranging data into primitive types, typed active record classes, collections and more
 - allowing to run any nonselect queries
 
-Databasic packages:
-- Microsoft SQL
-- MySql
-- PostgreSql
-- SQLite
-- OracleSql (in progress)
+## Features
+- choosing connection by config index or name as another param of Databasic.Statement.Prepare()
+- passing transactions as second param of Databasic.Statement.Prepare()
+- any non-select SQL statements
+- Microsoft SQL Server/MySQL/MariaDB/PostgreSQL/Oracle/ODBC/OLEDB support
+- selection single value (for example counts etc...)
+- getting only touched (changed) values
+- saving and deleting active record instances (insert/update/delete by primary key and autoincrement column)
+- much more...
 
 ## Instalation
 **This is core package only**. Install this package only by installing specific database package like: Databasic.&#60;DatabaseType&#62;. Then this package will be installed automaticly with the specific database package.
 ```nuget
 PM> Install-Package Databasic.DatabaseType
 ```
-(database types: MsSql, MySql, PostgreSql, SQLite, OracleSql)
-
-
+### Databasic packages:
+- `Databasic.MsSql`
+- `Databasic.MySql`
+- `Databasic.PostgreSql`
+- `Databasic.OracleSql`
+- `Databasic.SQLite`
+- `Databasic.OdbcSql`
+- `Databasic.OleSql`
 
 ## Basic Examples
 ```vb
@@ -32,6 +40,7 @@ Imports Databasic
 ' create active record class extending Databasic.ActiveRecord.Entity:
 <Connection("ConfigConnectionName")>
 Public Class Person
+    <PrimaryKey, AutoIncrement>
     Public Id As Int32?
     Public Property Firstname As String
     Public Property Secondname As String
@@ -66,6 +75,7 @@ using Databasic;
 // create active record class extending Databasic.ActiveRecord.Entity:
 [Connection("ConfigConnectionName")]
 public class Person {
+    [PrimaryKey, AutoIncrement]
     public int? Id;
     public string Firstname { get; set; }
     public string Secondname { get; set; }
@@ -102,6 +112,7 @@ using System.Collections.Generic;
 
 [Connection("DefaultConnection"),Table("Dealers")]
 class Dealer: Person {
+	[PrimaryKey, AutoIncrement]
 	public int? Id { get; set; }
 	[Column("Firstname"), Trim]
 	public string FirstName { get; set; }
@@ -121,10 +132,10 @@ class Dealer: Person {
 			$"SELECT COUNT(Id) FROM {Table()}"
 		).FetchOne().ToInstance<Int32>();
 	}
-	public static Dictionary<object, Dealer> GetDictionary (Func<Dealer, object> keySelector = null) {
+	public static Dictionary<int, Dealer> GetDictionary (Func<Dealer, int> keySelector = null) {
 		return Statement.Prepare(
 			$"SELECT {Columns()} FROM {Table()}"
-		).FetchAll().ToDictionary<object, Dealer>(
+		).FetchAll().ToDictionary<int, Dealer>(
 			keySelector ?? (d => d.Id.Value)
 		);
 	}
@@ -135,7 +146,7 @@ class Dealer: Person {
 	}
 }
 ...
-Dictionary<object, Dealer> dct = Dealer.GetDictionary();
+Dictionary<int, Dealer> dct = Dealer.GetDictionary();
 
 List<Dealer> list = Dealer.GetList();
 
@@ -143,11 +154,3 @@ Dealer dealer1 = Dealer.GetById(3);
 
 int cnt = Dealer.GetCount();
 ```
-
-## Features
-- choosing connection by config index or name as another param of Databasic.Statement.Prepare()
-- passing transactions as second param of Databasic.Statement.Prepare()
-- any non-select SQL statements
-- Microsoft SQL Server and MySQL server support
-- selection single value (for example counts etc...)
-- much more
