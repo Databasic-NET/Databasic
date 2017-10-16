@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg version="1.1" id="Vrstva_2" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+width="100px" height="100px" viewBox="0 0 100 100" style="enable-background:new 0 0 100 100;" xml:space="preserve">
+	<style type="text/css">
+	<![CDATA[
+		.st0{fill:url(#SVGID_1_);}
+		.st1{fill:url(#SVGID_2_);}
+		.st2{fill:url(#SVGID_3_);}
+		.st3{fill:url(#SVGID_4_);}
+		.st4{fill:url(#SVGID_5_);}
+		.st5{fill:url(#SVGID_6_);}
+		.st6{fill:#FFFFFF;}
+	]]>
+	</style>
+	<linearGradient id="SVGID_1_" gradientUnits="userSpaceOnUse" x1="8.0615" y1="82.334" x2="91.9385" y2="82.334">
+		<stop  offset="0" style="stop-color:#00AEEF"/>
+		<stop  offset="0.5" style="stop-color:#7AD5F7"/>
+		<stop  offset="1" style="stop-color:#00AEEF"/>
+	</linearGradient>
+		<path class="st0" d="M8.1,64.7v19.7C8.1,93,26.8,100,50,100s41.9-7,41.9-15.7V64.7H8.1z"/>
+		<path class="st6" d="M22.5,96.2c0,0,0.1,0,0.1,0c1.6,0.5,3.4,1,5.2,1.4v-33H18v29.8C19.4,95.1,20.9,95.6,22.5,96.2z"/>
+		<path class="st6" d="M37.8,99.3c3.2,0.4,6.5,0.6,9.9,0.7V64.7h-9.9V99.3z"/>
+	<radialGradient id="SVGID_2_" cx="50" cy="64.6689" r="50.125" gradientTransform="matrix(1 0 0 0.3733 0 40.5296)" gradientUnits="userSpaceOnUse">
+		<stop  offset="0" style="stop-color:#00AEEF"/>
+		<stop  offset="1" style="stop-color:#2E3192"/>
+	</radialGradient>
+	<ellipse class="st1" cx="50" cy="64.7" rx="41.9" ry="15.7"/>
+	<linearGradient id="SVGID_3_" gradientUnits="userSpaceOnUse" x1="8.0615" y1="58.3711" x2="91.9385" y2="58.3711">
+		<stop  offset="0" style="stop-color:#00AEEF"/>
+		<stop  offset="0.5" style="stop-color:#7AD5F7"/>
+		<stop  offset="1" style="stop-color:#00AEEF"/>
+	</linearGradient>
+	<path class="st2" d="M8.1,40.7v19.7C8.1,69,26.8,76,50,76s41.9-7,41.9-15.7V40.7H8.1z"/>
+	<path class="st6" d="M18,70.5c2.8,1.2,6.2,2.3,9.9,3.2v-33H18V70.5z"/>
+	<path class="st6" d="M37.8,75.4c3.2,0.4,6.5,0.6,9.9,0.7V40.7h-9.9V75.4z"/>
+	<radialGradient id="SVGID_4_" cx="50" cy="40.7061" r="50.0006" gradientTransform="matrix(1 0 0 0.3678 0 25.7354)" gradientUnits="userSpaceOnUse">
+		<stop  offset="0" style="stop-color:#00AEEF"/>
+		<stop  offset="1" style="stop-color:#2E3192"/>
+	</radialGradient>
+	<ellipse class="st3" cx="50" cy="40.7" rx="41.9" ry="15.7"/>
+	<linearGradient id="SVGID_5_" gradientUnits="userSpaceOnUse" x1="8.0615" y1="33.8662" x2="91.9385" y2="33.8662">
+		<stop  offset="0" style="stop-color:#00AEEF"/>
+		<stop  offset="0.5" style="stop-color:#7AD5F7"/>
+		<stop  offset="1" style="stop-color:#00AEEF"/>
+	</linearGradient>
+	<path class="st4" d="M8.1,15.7v20.8c0,8.6,18.8,15.7,41.9,15.7s41.9-7,41.9-15.7V15.7H8.1z"/>
+	<path class="st6" d="M18,46.5c2.8,1.2,6.2,2.3,9.9,3.2V15.7H18V46.5z"/>
+	<path class="st6" d="M37.8,51.4c3.2,0.4,6.5,0.6,9.9,0.7V15.7h-9.9V51.4z"/>
+	<radialGradient id="SVGID_6_" cx="50" cy="15.6592" r="50.2498" gradientTransform="matrix(1 0 0 0.3809 0 9.6951)" gradientUnits="userSpaceOnUse">
+		<stop  offset="0" style="stop-color:#00AEEF"/>
+		<stop  offset="1" style="stop-color:#2E3192"/>
+	</radialGradient>
+	<ellipse class="st5" cx="50" cy="15.7" rx="41.9" ry="15.7"/>
+	<g>
+		<path class="st6" d="M50,75.4c-15.8,0-29.6-3.5-37.4-7.9c6.9,5.1,21.1,9.2,37.4,9.2s30.4-4.1,37.4-9.2C79.6,71.9,65.8,75.4,50,75.4	z"/>
+		<path class="st6" d="M50,30.7c-15.8,0-29.6-3.5-37.4-7.9c6.9,5.1,21.1,9.2,37.4,9.2s30.4-4.1,37.4-9.2C79.6,27.1,65.8,30.7,50,30.7	z"/>
+		<path class="st6" d="M50,51.4c-15.8,0-29.6-3.5-37.4-7.9c6.9,5.1,21.1,9.2,37.4,9.2s30.4-4.1,37.4-9.2C79.6,47.9,65.8,51.4,50,51.4	z"/>
+	</g>
+	<path class="st6" d="M37.8,30.6l24.6-30c-3.2-0.4-6.6-0.6-9.9-0.7l-4.8,31.3C44.4,31.2,41.1,31,37.8,30.6z"/>
+	<path class="st6" d="M18,25.8L82,5.5c-2.6-1.2-6-2.3-9.8-3.2L27.9,29C24.3,28.2,21,27.1,18,25.8z"/>
+</svg>
