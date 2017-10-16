@@ -5,14 +5,14 @@ Namespace ActiveRecord
 	Partial Public MustInherit Class Entity
 		Inherits DynamicObject
 
-        Public Function Save(Optional insertNew As Boolean = False) As Integer
-            Dim connection As Connection = Connection.Get(
-                Tools.GetConnectionIndexByClassAttr(Me.GetType(), True)
-            )
-            Return connection.GetProviderResource().Save(insertNew, Me, connection)
-        End Function
+  Public Function Save(Optional insertNew As Boolean = False) As Integer
+   Dim connection As Connection = Connection.Get(
+    Tools.GetConnectionIndexByClassAttr(Me.GetType(), True)
+   )
+   Return connection.GetProviderResource().Save(insertNew, Me, connection)
+  End Function
 
-        Public Function Save(insertNew As Boolean, connection As Connection) As Integer
+  Public Function Save(insertNew As Boolean, connection As Connection) As Integer
 			Return connection.GetProviderResource().Save(insertNew, Me, connection)
 		End Function
 

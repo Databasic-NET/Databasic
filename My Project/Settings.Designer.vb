@@ -44,8 +44,8 @@ Namespace My
    If Not addedHandler Then
   SyncLock addedHandlerLockObject
    If Not addedHandler Then
-    AddHandler My.Application.Shutdown, AddressOf AutoSaveSettings
-    addedHandler = True
+ AddHandler My.Application.Shutdown, AddressOf AutoSaveSettings
+ addedHandler = True
    End If
   End SyncLock
  End If

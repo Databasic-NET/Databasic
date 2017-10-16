@@ -15,18 +15,18 @@
 			Dim autoIncrementColName As String
 			Dim trans As Transaction = Nothing
 			Try
-                If classMetaDescription.AutoIncrementColumn.HasValue Then
-                    trans = connection.BeginTransaction("Dtbsc.Prvdr.Rsrc.Save()", IsolationLevel.Unspecified)
-                    result = Me.Insert(instance, trans, classMetaDescription)
-                    lastInsertedId = Me.GetLastInsertedId(trans, classMetaDescription)
-                    trans.Commit()
-                    autoIncrementColName = classMetaDescription.AutoIncrementColumn.Value.CodeColumnName
-                    instance.[Set](
-                        autoIncrementColName, lastInsertedId, True,
-                        classMetaDescription.ColumnsByCodeNames(autoIncrementColName)
-                    )
-                Else
-                    result = Me.Insert(instance, connection, classMetaDescription)
+    If classMetaDescription.AutoIncrementColumn.HasValue Then
+     trans = connection.BeginTransaction("Dtbsc.Prvdr.Rsrc.Save()", IsolationLevel.Unspecified)
+     result = Me.Insert(instance, trans, classMetaDescription)
+     lastInsertedId = Me.GetLastInsertedId(trans, classMetaDescription)
+     trans.Commit()
+     autoIncrementColName = classMetaDescription.AutoIncrementColumn.Value.CodeColumnName
+     instance.[Set](
+      autoIncrementColName, lastInsertedId, True,
+      classMetaDescription.ColumnsByCodeNames(autoIncrementColName)
+     )
+    Else
+     result = Me.Insert(instance, connection, classMetaDescription)
 				End If
 			Catch ex As Exception
 				If TypeOf trans Is Transaction Then trans.Rollback()

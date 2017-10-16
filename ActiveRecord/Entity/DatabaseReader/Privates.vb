@@ -49,14 +49,14 @@ Namespace ActiveRecord
 				If columnsByDbNames.ContainsKey(readerColumnName) Then
 					mi = columnsByDbNames(readerColumnName)
 					rawValueTypeCode = Type.GetTypeCode(rawValue.GetType())
-     If (rawValueTypeCode = Constants.StringTypeCode AndAlso mi.TrimChars.Length > 0) Then
-      rawValue = rawValue.ToString().Trim(mi.TrimChars)
-     ElseIf rawValueTypeCode = Type.GetTypeCode(mi.Type) Then
-      targetValue = rawValue
-     ElseIf mi.Type.IsEnum Then
-      targetValue = System.[Enum].Parse(mi.Type, rawValue.ToString())
-     Else
-      formatProvider = If(mi.FormatProvider, System.Globalization.CultureInfo.CurrentCulture)
+  If (rawValueTypeCode = Constants.StringTypeCode AndAlso mi.TrimChars.Length > 0) Then
+   rawValue = rawValue.ToString().Trim(mi.TrimChars)
+  ElseIf rawValueTypeCode = Type.GetTypeCode(mi.Type) Then
+   targetValue = rawValue
+  ElseIf mi.Type.IsEnum Then
+   targetValue = System.[Enum].Parse(mi.Type, rawValue.ToString())
+  Else
+   formatProvider = If(mi.FormatProvider, System.Globalization.CultureInfo.CurrentCulture)
 						targetValue = If(TypeOf rawValue Is DBNull, Nothing, Convert.ChangeType(rawValue, mi.Type, formatProvider))
 					End If
 					If (mi.MemberInfoType = MemberInfoType.Prop) Then

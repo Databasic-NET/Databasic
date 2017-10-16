@@ -30,21 +30,21 @@
 		) ' keys by db names
 		Dim separator As String = ""
 		Dim paramsCounter As Int16 = 0
-        Dim aiColumnName As String = If(
-            classMetaDescription.AutoIncrementColumn.HasValue,
-            classMetaDescription.AutoIncrementColumn.Value.DatabaseColumnName, ""
-        )
-        For Each item As KeyValuePair(Of String, MemberInfo) In classMetaDescription.ColumnsByDatabaseNames
-            If (item.Key = aiColumnName) Then Continue For
-            If (item.Value.MemberInfoType = MemberInfoType.Field) Then Continue For
-            If (Not touched.ContainsKey(item.Key)) Then Continue For
-            columnsSql += separator + item.Key
-            paramsSql += separator + "@param" + paramsCounter.ToString()
-            params.Add("param" + paramsCounter.ToString(), touched(item.Key))
-            paramsCounter += 1
-            separator = ", "
-        Next
-        Return Databasic.Statement.Prepare(
+  Dim aiColumnName As String = If(
+   classMetaDescription.AutoIncrementColumn.HasValue,
+   classMetaDescription.AutoIncrementColumn.Value.DatabaseColumnName, ""
+  )
+  For Each item As KeyValuePair(Of String, MemberInfo) In classMetaDescription.ColumnsByDatabaseNames
+   If (item.Key = aiColumnName) Then Continue For
+   If (item.Value.MemberInfoType = MemberInfoType.Field) Then Continue For
+   If (Not touched.ContainsKey(item.Key)) Then Continue For
+   columnsSql += separator + item.Key
+   paramsSql += separator + "@param" + paramsCounter.ToString()
+   params.Add("param" + paramsCounter.ToString(), touched(item.Key))
+   paramsCounter += 1
+   separator = ", "
+  Next
+  Return Databasic.Statement.Prepare(
 			$"INSERT INTO {ActiveRecord.Resource.Table(classMetaDescription)} ({columnsSql}) 
 			VALUES ({paramsSql})",
 			transactionOrConnection

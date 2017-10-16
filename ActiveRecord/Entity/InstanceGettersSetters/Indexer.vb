@@ -1,6 +1,7 @@
 ﻿Imports System.Dynamic
 Imports System.Reflection
 Imports System.Runtime.CompilerServices
+Imports System.Runtime.Serialization
 
 Namespace ActiveRecord
 	''' <summary>
@@ -9,7 +10,7 @@ Namespace ActiveRecord
 	''' named in the same case sensitive way as columns are named in database.
 	''' Choose fields and properties types to fit into database types.
 	''' </summary>
-	<DefaultMember("Item")>
+	<DefaultMember("Item"), DataContract, Serializable>
 	Partial Public MustInherit Class Entity
 		Inherits DynamicObject
 

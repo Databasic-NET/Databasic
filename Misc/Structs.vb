@@ -62,7 +62,8 @@ Friend Structure ProviderNames
 	Friend Shared Values As Dictionary(Of ProviderName, String) = New Dictionary(Of ProviderName, String) From {
 		{ProviderName.MsSql, "System.Data.SqlClient"},
 		{ProviderName.MySql, "MySql.Data.MySqlClient"},
-		{ProviderName.ODBC, "System.Data.Odbc"},
+		{ProviderName.OdbcSql, "System.Data.Odbc"},
+		{ProviderName.OleSql, "System.Data.OleDb"},
 		{ProviderName.OracleSql, "Oracle.DataAccess.Client"},
 		{ProviderName.PostgreSQL, "Npgsql"},
 		{ProviderName.SQLite, "System.Data.SQLite"}

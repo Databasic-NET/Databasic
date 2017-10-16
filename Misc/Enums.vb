@@ -49,9 +49,13 @@ Public Enum ProviderName
 	''' <summary>
 	''' ODBC server - System.Data.Odbc
 	''' </summary>
-	ODBC
+	OdbcSql
 	''' <summary>
-	''' Oracle server - Oracle.DataAccess.Client
+	''' ODBC server - System.Data.Odbc
+	''' </summary>
+	OleSql
+	''' <summary>
+	''' OLE database or server - Oracle.DataAccess.Client
 	''' </summary>
 	OracleSql
 	''' <summary>

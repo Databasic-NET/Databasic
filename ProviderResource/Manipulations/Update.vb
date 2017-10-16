@@ -36,17 +36,17 @@
 			classMetaDescription.AutoIncrementColumn.HasValue,
 			classMetaDescription.AutoIncrementColumn.Value.DatabaseColumnName, ""
 		)
-        Dim separator As String = ""
-        For Each item As KeyValuePair(Of String, MemberInfo) In classMetaDescription.ColumnsByDatabaseNames
-            If (item.Key = aiColumnName) Then Continue For
-            If (item.Value.MemberInfoType = MemberInfoType.Field) Then Continue For
-            If (Not touched.ContainsKey(item.Key)) Then Continue For
-            sql += separator + item.Key + " = @param" + paramsCounter.ToString()
-            params.Add("param" + paramsCounter.ToString(), touched(item.Key))
-            paramsCounter += 1
-            separator = ", "
-        Next
-        sql += " WHERE "
+  Dim separator As String = ""
+  For Each item As KeyValuePair(Of String, MemberInfo) In classMetaDescription.ColumnsByDatabaseNames
+   If (item.Key = aiColumnName) Then Continue For
+   If (item.Value.MemberInfoType = MemberInfoType.Field) Then Continue For
+   If (Not touched.ContainsKey(item.Key)) Then Continue For
+   sql += separator + item.Key + " = @param" + paramsCounter.ToString()
+   params.Add("param" + paramsCounter.ToString(), touched(item.Key))
+   paramsCounter += 1
+   separator = ", "
+  Next
+  sql += " WHERE "
 		separator = ""
 		For Each columnItem As KeyValuePair(Of String, String) In keyColumns.Columns
 			sql += separator + columnItem.Value + " = @param" + paramsCounter.ToString()

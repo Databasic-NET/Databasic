@@ -59,7 +59,7 @@ Partial Public MustInherit Class Connection
 	''' <summary>
 	''' Threads semahore to read/write into managed connections store.
 	''' </summary>
-	Private Shared _staticInitDoneLock As New Object
+	Private Shared _staticInitDoneLock As New ReaderWriterLockSlim
 	''' <summary>
 	''' True if static initialization completed, nothing else.
 	''' </summary>

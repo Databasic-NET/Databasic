@@ -23,19 +23,19 @@ Public Class Tools
 	Public Shared Function GetTypeGlobaly(ByVal fullClassName As String) As Type
 		Dim type As Type = Type.GetType(fullClassName)
 		If type IsNot Nothing Then Return type
-
 		If fullClassName.IndexOf(":") > -1 Then
 			Dim fullNameAndAssembly As String() = fullClassName.Split(":")
 			type = Tools.GetTypeGlobaly(fullNameAndAssembly(0), fullNameAndAssembly(1))
 			If type IsNot Nothing Then Return type
 		End If
-
 		Dim assemblies As Reflection.Assembly() = AppDomain.CurrentDomain.GetAssemblies()
 		For Each assembly As Reflection.Assembly In assemblies
 			type = assembly.GetType(fullClassName)
 			If type IsNot Nothing Then Return type
 		Next
+		Return Nothing
 	End Function
+
 
 	''' <summary>
 	''' Return Type object by two strings in form: "AssemblyName", "Full.Class.Name"
@@ -46,10 +46,15 @@ Public Class Tools
 	Public Shared Function GetTypeGlobaly(assemblyName As String, fullClassName As String) As Type
 		Dim type As Type = Nothing
 		Try
-			Dim assemblies As IEnumerable(Of Assembly) =
-				From file In Directory.GetFiles(AppDomain.CurrentDomain.BaseDirectory)
+			Dim execDirPath As String = System.IO.Path.GetDirectoryName(
+				Assembly.GetExecutingAssembly().Location
+			)
+			Dim execDirFiles As String() = Directory.GetFiles(execDirPath)
+			Dim assemblies As IEnumerable(Of Assembly) = (
+				From file In execDirFiles
 				Where Path.GetExtension(file) = ".dll"
 				Select Assembly.LoadFrom(file)
+			)
 			For Each assembly As Reflection.Assembly In assemblies
 				If assembly.GetName().Name = assemblyName Then
 					type = assembly.GetType(fullClassName)
@@ -58,9 +63,7 @@ Public Class Tools
 			Next
 		Catch ex As Exception
 		End Try
-
 		Return type
-
 	End Function
 
 	Public Shared Function GetConnectionIndexByClassAttr(type As Type, Optional throwException As Boolean = True) As Int32
@@ -78,4 +81,5 @@ Public Class Tools
 		End If
 		Return connAttr.ConnectionIndex
 	End Function
+
 End Class
