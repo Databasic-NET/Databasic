@@ -1,4 +1,4 @@
-﻿Imports System.Configuration
+Imports System.Configuration
 Imports System.Data.Common
 Imports System.IO
 Imports System.Reflection
@@ -46,14 +46,15 @@ Partial Public MustInherit Class Connection
 	End Sub
 
 	Private Shared Sub _staticInitCompleteProviders()
-		Dim asms As New Dictionary(Of String, Reflection.Assembly)
+		Dim asms As New List(Of String)
 		Dim asmName As String
 		Dim connectionType As Type
 		Dim conn As Connection
 		Dim referencedAsms As Reflection.Assembly() = AppDomain.CurrentDomain.GetAssemblies()
 		For Each asm As Reflection.Assembly In referencedAsms
+			asmName = asm.GetName().Name
+			asms.Add(asmName)
 			If Connection._staticInitIsDatabasicSubAssembly(asm) Then
-				asmName = asm.GetName().Name
 				connectionType = asm.GetType(asmName + ".Connection")
 				If Not TypeOf connectionType Is Type Then Continue For
 				conn = Activator.CreateInstance(connectionType)
@@ -63,6 +64,29 @@ Partial Public MustInherit Class Connection
 				)
 			End If
 		Next
+		Try
+			Dim appDirAsms As IEnumerable(Of Assembly) = (
+				From file In Directory.GetFiles(AppDomain.CurrentDomain.BaseDirectory)
+				Where Path.GetExtension(file).ToLower() = ".dll"
+				Select Assembly.LoadFrom(file)
+			)
+			For Each asm As System.Reflection.Assembly In appDirAsms
+				asmName = asm.GetName().Name
+				If (
+					Not asms.Contains(asmName) And
+					Connection._staticInitIsDatabasicSubAssembly(asm)
+				) Then
+					connectionType = asm.GetType(asmName + ".Connection")
+					If Not TypeOf connectionType Is Type Then Continue For
+					conn = Activator.CreateInstance(connectionType)
+					Connection._supportedProviders.Add(conn.ClientName, connectionType)
+					Connection._providersResources.Add(
+						conn.ClientName, Activator.CreateInstance(conn.ProviderResource)
+					)
+				End If
+			Next
+		Catch ex As Exception
+		End Try
 	End Sub
 
 	Private Shared Function _staticInitIsDatabasicSubAssembly(asm As Reflection.Assembly) As Boolean
