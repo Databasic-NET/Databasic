@@ -1,4 +1,4 @@
-﻿Imports System.Diagnostics
+Imports System.Diagnostics
 Imports System.IO
 Imports System.Reflection
 Imports System.Threading
@@ -66,20 +66,40 @@ Public Class Tools
 		Return type
 	End Function
 
-	Public Shared Function GetConnectionIndexByClassAttr(type As Type, Optional throwException As Boolean = True) As Int32
-		Dim connAttr As ConnectionAttribute = DirectCast(Attribute.GetCustomAttribute(type, Constants.ConnectionAttrType), ConnectionAttribute)
-		If Not TypeOf connAttr Is ConnectionAttribute Then
-			If throwException Then
-				Throw New Exception(
-					$"Class '{type.FullName}' has no 'Connection' attribute. " +
-					"Add 'Connection' class attribute or specify connection instance, " +
-					"connection config index or connection config name."
-				)
-			Else
-				Return Databasic.Defaults.CONNECTION_INDEX
-			End If
-		End If
-		Return connAttr.ConnectionIndex
-	End Function
+    Public Shared Function GetConnectionIndexByClassAttr(type As Type, Optional throwException As Boolean = True) As Int32
+        Dim connAttr As ConnectionAttribute = DirectCast(Attribute.GetCustomAttribute(type, Constants.ConnectionAttrType), ConnectionAttribute)
+        If Not TypeOf connAttr Is ConnectionAttribute Then
+            If throwException Then
+                Throw New Exception(
+                    $"Class '{type.FullName}' has no 'Connection' attribute. " +
+                    "Add 'Connection' class attribute or specify connection instance, " +
+                    "connection config index or connection config name."
+                )
+            Else
+                Return Databasic.Defaults.CONNECTION_INDEX
+            End If
+        End If
+        Return connAttr.ConnectionIndex
+    End Function
+
+    ''' <summary>
+    ''' Return True if type is descriptable type by custom attributes, not primitive, not an object.
+    ''' </summary>
+    ''' <param name="type">Type object to check out.</param>
+    ''' <returns>True if descriptable.</returns>
+    Public Shared Function IsDescriptableType(ByRef type As Type) As Boolean
+        Return Not type.IsPrimitive AndAlso
+            type.FullName <> "System.String" AndAlso
+            type.FullName <> "System.Object"
+    End Function
+
+    ''' <summary>
+    ''' Return True if type is primitive value or string.
+    ''' </summary>
+    ''' <param name="type">Type object to check out.</param>
+    ''' <returns>True if primitive type or string.</returns>
+    Public Shared Function IsPrimitiveType(ByRef type As Type) As Boolean
+        Return type.IsPrimitive OrElse type.FullName = "System.String"
+    End Function
 
 End Class

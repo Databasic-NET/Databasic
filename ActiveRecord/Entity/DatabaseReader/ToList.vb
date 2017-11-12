@@ -1,4 +1,4 @@
-﻿Imports System.Data.Common
+Imports System.Data.Common
 Imports Databasic.ActiveRecord
 
 Namespace ActiveRecord
@@ -19,22 +19,28 @@ Namespace ActiveRecord
 			Dim instance As Object
 			Dim instanceType As Type = GetType(TValue)
 			Dim isEntity As Boolean = GetType(Entity).IsAssignableFrom(instanceType)
-			Dim descriptableType As Boolean = Entity._isDescriptableType(instanceType)
-			If (descriptableType AndAlso Not TypeOf columnsByDbNames Is Dictionary(Of String, Databasic.MemberInfo)) Then
+            Dim descriptableType As Boolean = Tools.IsDescriptableType(instanceType)
+            If (descriptableType AndAlso Not TypeOf columnsByDbNames Is Dictionary(Of String, Databasic.MemberInfo)) Then
 				columnsByDbNames = MetaDescriptor.GetColumnsByDbNames(instanceType)
 			End If
 			If reader.HasRows() Then
 				While reader.Read()
-					If descriptableType Then
-						columns = If(columns.Count = 0, ActiveRecord.Entity._getReaderRowColumns(reader), columns)
-						instance = Activator.CreateInstance(Of TValue)()
-						'If isEntity Then DirectCast(instance, Databasic.ActiveRecord.Entity).InitResource()
-						ActiveRecord.Entity._readerRowToInstance(
-							reader, columns, columnsByDbNames, instance, isEntity
-						)
-					Else
-						instance = DirectCast(reader(0), TValue)
-					End If
+                    If descriptableType Then
+                        columns = If(columns.Count = 0, ActiveRecord.Entity._getReaderRowColumns(reader), columns)
+                        instance = Activator.CreateInstance(Of TValue)()
+                        'If isEntity Then DirectCast(instance, Databasic.ActiveRecord.Entity).InitResource()
+                        ActiveRecord.Entity._readerRowToTypedInstance(
+                            reader, columns, columnsByDbNames, instance, isEntity
+                        )
+                    ElseIf Tools.IsPrimitiveType(instanceType) Then
+                        instance = DirectCast(reader(0), TValue)
+                    Else
+                        columns = If(columns.Count = 0, ActiveRecord.Entity._getReaderRowColumns(reader), columns)
+                        instance = DirectCast(reader(0), TValue)
+                        ActiveRecord.Entity._readerRowToAnonymousInstance(
+                            reader, columns, instance
+                        )
+                    End If
 					result.Add(instance)
 				End While
 			End If

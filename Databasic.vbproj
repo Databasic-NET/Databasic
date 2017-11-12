@@ -89,6 +89,7 @@
     <Compile Include="ActiveRecord\Resources\Columns\ColumnsExcept.vb" />
     <Compile Include="ActiveRecord\Resources\Columns\Columns.vb" />
     <Compile Include="ActiveRecord\Resources\Columns\KeyColumns.vb" />
+    <Compile Include="Attributes\UseEnumUnderlyingValue.vb" />
     <Compile Include="Attributes\Format.vb" />
     <Compile Include="Attributes\AutoIncrement.vb" />
     <Compile Include="Attributes\Trim.vb" />
@@ -98,6 +99,7 @@
     <Compile Include="MetaDescriptor.vb" />
     <Compile Include="Misc\Errors.vb" />
     <Compile Include="Misc\Tools.vb" />
+    <Compile Include="Object.vb" />
     <Compile Include="ProviderResource\Columns.vb" />
     <Compile Include="ActiveRecord\Resources\Table.vb" />
     <Compile Include="Attributes\Column.vb" />

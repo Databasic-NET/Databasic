@@ -1,4 +1,4 @@
-﻿Public Structure KeyColumns
+Public Structure KeyColumns
 	Public Type As KeyType
 	Public Columns As Dictionary(Of String, String)
 	Public AutoIncrementColumn As AutoIncrementColumn?
@@ -32,8 +32,9 @@ Public Structure MemberInfo
 	Public Name As String
 	Public MemberInfo As System.Reflection.MemberInfo
 	Public MemberInfoType As MemberInfoType
-	Public FormatProvider As IFormatProvider
-	Public TrimChars As Char()
+    Public FormatProvider As IFormatProvider
+    Public UseEnumUnderlyingValue As Boolean
+    Public TrimChars As Char()
 End Structure
 
 Public Structure Defaults
@@ -42,20 +43,21 @@ Public Structure Defaults
 	Public Const KEY_NAME As String = "default"
 End Structure
 
-Friend Structure Constants
-	''' <summary>
-	''' String type code value, used frequently in Entity._readerRowToInstance.
-	''' </summary>
-	Friend Shared ReadOnly StringTypeCode As TypeCode = Type.GetTypeCode(GetType(String))
+Public Structure Constants
+    ''' <summary>
+    ''' String type code value, used frequently in Entity._readerRowToInstance.
+    ''' </summary>
+    Public Shared ReadOnly StringTypeCode As TypeCode = Type.GetTypeCode(GetType(String))
 
-	Friend Shared ConnectionAttrType As Type = GetType(ConnectionAttribute)
-	Friend Shared TableAttrType As Type = GetType(TableAttribute)
-	Friend Shared ColumnAttrType As Type = GetType(ColumnAttribute)
-	Friend Shared FormatAttrType As Type = GetType(FormatAttribute)
-	Friend Shared TrimAttrType As Type = GetType(TrimAttribute)
-	Friend Shared PrimaryKeyAttrType As Type = GetType(PrimaryKeyAttribute)
-	Friend Shared UniqueKeyAttrType As Type = GetType(UniqueKeyAttribute)
-	Friend Shared AutoIncrementAttrType As Type = GetType(AutoIncrementAttribute)
+    Public Shared ConnectionAttrType As Type = GetType(ConnectionAttribute)
+    Public Shared TableAttrType As Type = GetType(TableAttribute)
+    Public Shared ColumnAttrType As Type = GetType(ColumnAttribute)
+    Public Shared FormatAttrType As Type = GetType(FormatAttribute)
+    Public Shared TrimAttrType As Type = GetType(TrimAttribute)
+    Public Shared PrimaryKeyAttrType As Type = GetType(PrimaryKeyAttribute)
+    Public Shared UniqueKeyAttrType As Type = GetType(UniqueKeyAttribute)
+    Public Shared AutoIncrementAttrType As Type = GetType(AutoIncrementAttribute)
+    Public Shared UseEnumUnderlyingValuesAttrType As Type = GetType(UseEnumUnderlyingValue)
 End Structure
 
 Friend Structure ProviderNames

@@ -1,4 +1,4 @@
-﻿Imports System.Data.Common
+Imports System.Data.Common
 Imports System.Threading
 
 Partial Public MustInherit Class Connection
@@ -30,7 +30,17 @@ Partial Public MustInherit Class Connection
 		providerName As ProviderName,
 		Optional overwriteExisting As Boolean = False
 	)
-		Connection._registerConfigRecord(name, connectionString, providerName, overwriteExisting)
+		Dim providerNameStr = If(
+			ProviderNames.Values.ContainsKey(providerName),
+			ProviderNames.Values(providerName),
+			""
+		)
+		Connection._registerConfigRecord(
+			name,
+			connectionString,
+			providerNameStr,
+			overwriteExisting
+		)
 	End Sub
 	Private Shared Sub _registerConfigRecord(
 		name As String,
