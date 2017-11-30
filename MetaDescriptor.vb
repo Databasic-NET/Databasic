@@ -206,61 +206,61 @@ Public Class MetaDescriptor
 			columnAttr As ColumnAttribute,
 			formatAttr As FormatAttribute, formatProvider As IFormatProvider,
 			trimAttr As TrimAttribute, trimChars As Char(), keyName As String,
-			autoIncrementPrimaryKeyAttr As AutoIncrementPrimaryKeyAttribute,
+			idColumnAttr As IdColumnAttribute,
 			autoIncrementAttr As AutoIncrementAttribute,
 			primaryKeyAttr As PrimaryKeyAttribute,
 			uniqueKeyAttr As UniqueKeyAttribute,
 			useEnumUnderlyingValueAttr As UseEnumUnderlyingValue,
 		reflMemberInfo As Reflection.MemberInfo
 		result.ColumnsByCodeNames = New Dictionary(Of String, Databasic.MemberInfo)
-        result.ColumnsByDatabaseNames = New Dictionary(Of String, Databasic.MemberInfo)
-        result.PrimaryColumns = New Dictionary(Of String, Dictionary(Of String, String))
-        result.UniqueColumns = New Dictionary(Of String, Dictionary(Of String, String))
-        result.AutoIncrementColumn = Nothing
-        Dim members As Dictionary(Of String, Databasic.MemberInfo) = MetaDescriptor._completeInstanceDataMembers(type)
-        For Each item In members
-            reflMemberInfo = item.Value.MemberInfo
-            columnAttr = DirectCast(Attribute.GetCustomAttribute(reflMemberInfo, Constants.ColumnAttrType), ColumnAttribute)
-            formatAttr = DirectCast(Attribute.GetCustomAttribute(reflMemberInfo, Constants.FormatAttrType), FormatAttribute)
+		result.ColumnsByDatabaseNames = New Dictionary(Of String, Databasic.MemberInfo)
+		result.PrimaryColumns = New Dictionary(Of String, Dictionary(Of String, String))
+		result.UniqueColumns = New Dictionary(Of String, Dictionary(Of String, String))
+		result.AutoIncrementColumn = Nothing
+		Dim members As Dictionary(Of String, Databasic.MemberInfo) = MetaDescriptor._completeInstanceDataMembers(type)
+		For Each item In members
+			reflMemberInfo = item.Value.MemberInfo
+			columnAttr = DirectCast(Attribute.GetCustomAttribute(reflMemberInfo, Constants.ColumnAttrType), ColumnAttribute)
+			formatAttr = DirectCast(Attribute.GetCustomAttribute(reflMemberInfo, Constants.FormatAttrType), FormatAttribute)
 			trimAttr = DirectCast(Attribute.GetCustomAttribute(reflMemberInfo, Constants.TrimAttrType), TrimAttribute)
-			autoIncrementPrimaryKeyAttr = DirectCast(Attribute.GetCustomAttribute(reflMemberInfo, Constants.AutoIncrementPrimaryKeyAttrType), AutoIncrementPrimaryKeyAttribute)
+			idColumnAttr = DirectCast(Attribute.GetCustomAttribute(reflMemberInfo, Constants.IdColumnAttrType), IdColumnAttribute)
 			autoIncrementAttr = DirectCast(Attribute.GetCustomAttribute(reflMemberInfo, Constants.AutoIncrementAttrType), AutoIncrementAttribute)
 			primaryKeyAttr = DirectCast(Attribute.GetCustomAttribute(reflMemberInfo, Constants.PrimaryKeyAttrType), PrimaryKeyAttribute)
 			uniqueKeyAttr = DirectCast(Attribute.GetCustomAttribute(reflMemberInfo, Constants.UniqueKeyAttrType), UniqueKeyAttribute)
 			useEnumUnderlyingValueAttr = DirectCast(Attribute.GetCustomAttribute(item.Value.Type, Constants.UseEnumUnderlyingValuesAttrType), UseEnumUnderlyingValue)
-            codeColumnName = reflMemberInfo.Name
-            dbColumnName = codeColumnName
-            keyName = ""
-            If TypeOf columnAttr Is ColumnAttribute Then
-                dbColumnName = If(String.IsNullOrEmpty(columnAttr.ColumnName), codeColumnName, columnAttr.ColumnName)
-            End If
-            formatProvider = If(TypeOf formatAttr Is FormatAttribute, formatAttr.FormatProvider, Nothing)
-            trimChars = If(TypeOf trimAttr Is TrimAttribute, trimAttr.Chars, New Char() {})
-            ' complete code column names and db column names collections
-            result.ColumnsByCodeNames.Add(codeColumnName, New Databasic.MemberInfo With {
-                .Name = dbColumnName,
-                .MemberInfo = reflMemberInfo,
-                .Type = item.Value.Type,
-                .FormatProvider = formatProvider,
-                .TrimChars = trimChars,
-                .MemberInfoType = item.Value.MemberInfoType,
-                .Value = Nothing,
-                .UseEnumUnderlyingValue = TypeOf useEnumUnderlyingValueAttr Is UseEnumUnderlyingValue
-            })
-            result.ColumnsByDatabaseNames.Add(dbColumnName, New Databasic.MemberInfo With {
-                .Name = codeColumnName,
-                .MemberInfo = reflMemberInfo,
-                .Type = item.Value.Type,
-                .FormatProvider = formatProvider,
-                .TrimChars = trimChars,
-                .MemberInfoType = item.Value.MemberInfoType,
-                .Value = Nothing,
-                .UseEnumUnderlyingValue = TypeOf useEnumUnderlyingValueAttr Is UseEnumUnderlyingValue
-            })
+			codeColumnName = reflMemberInfo.Name
+			dbColumnName = codeColumnName
+			keyName = ""
+			If TypeOf columnAttr Is ColumnAttribute Then
+				dbColumnName = If(String.IsNullOrEmpty(columnAttr.ColumnName), codeColumnName, columnAttr.ColumnName)
+			End If
+			formatProvider = If(TypeOf formatAttr Is FormatAttribute, formatAttr.FormatProvider, Nothing)
+			trimChars = If(TypeOf trimAttr Is TrimAttribute, trimAttr.Chars, New Char() {})
+			' complete code column names and db column names collections
+			result.ColumnsByCodeNames.Add(codeColumnName, New Databasic.MemberInfo With {
+				.Name = dbColumnName,
+				.MemberInfo = reflMemberInfo,
+				.Type = item.Value.Type,
+				.FormatProvider = formatProvider,
+				.TrimChars = trimChars,
+				.MemberInfoType = item.Value.MemberInfoType,
+				.Value = Nothing,
+				.UseEnumUnderlyingValue = TypeOf useEnumUnderlyingValueAttr Is UseEnumUnderlyingValue
+			})
+			result.ColumnsByDatabaseNames.Add(dbColumnName, New Databasic.MemberInfo With {
+				.Name = codeColumnName,
+				.MemberInfo = reflMemberInfo,
+				.Type = item.Value.Type,
+				.FormatProvider = formatProvider,
+				.TrimChars = trimChars,
+				.MemberInfoType = item.Value.MemberInfoType,
+				.Value = Nothing,
+				.UseEnumUnderlyingValue = TypeOf useEnumUnderlyingValueAttr Is UseEnumUnderlyingValue
+			})
 			' if there is any key info at class element, add it into keys info collections
 			If (
 				TypeOf primaryKeyAttr Is PrimaryKeyAttribute OrElse
-				TypeOf autoIncrementPrimaryKeyAttr Is AutoIncrementPrimaryKeyAttribute
+				TypeOf idColumnAttr Is IdColumnAttribute
 			) Then
 				If Not String.IsNullOrEmpty(primaryKeyAttr.KeyName) Then keyName = primaryKeyAttr.KeyName
 				If result.PrimaryColumns.ContainsKey(keyName) Then
@@ -272,18 +272,18 @@ Public Class MetaDescriptor
 				End If
 			End If
 			If TypeOf uniqueKeyAttr Is UniqueKeyAttribute Then
-                If Not String.IsNullOrEmpty(uniqueKeyAttr.KeyName) Then keyName = uniqueKeyAttr.KeyName
-                If result.UniqueColumns.ContainsKey(keyName) Then
-                    result.UniqueColumns(keyName).Add(codeColumnName, dbColumnName)
-                Else
-                    result.UniqueColumns.Add(keyName, New Dictionary(Of String, String)() From {
-                        {codeColumnName, dbColumnName}
-                    })
-                End If
-            End If
+				If Not String.IsNullOrEmpty(uniqueKeyAttr.KeyName) Then keyName = uniqueKeyAttr.KeyName
+				If result.UniqueColumns.ContainsKey(keyName) Then
+					result.UniqueColumns(keyName).Add(codeColumnName, dbColumnName)
+				Else
+					result.UniqueColumns.Add(keyName, New Dictionary(Of String, String)() From {
+						{codeColumnName, dbColumnName}
+					})
+				End If
+			End If
 			If (
 				TypeOf autoIncrementAttr Is AutoIncrementAttribute OrElse
-				TypeOf autoIncrementPrimaryKeyAttr Is AutoIncrementPrimaryKeyAttribute
+				TypeOf idColumnAttr Is IdColumnAttribute
 			) Then
 				If Not result.AutoIncrementColumn.HasValue Then
 					result.AutoIncrementColumn = New AutoIncrementColumn With {

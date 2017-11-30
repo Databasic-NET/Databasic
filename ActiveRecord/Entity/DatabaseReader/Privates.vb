@@ -8,7 +8,7 @@ Namespace ActiveRecord
 			If keyColumns.Columns.Count <> 1 Then
 				Throw New Exception(String.Format(
 					"There was not possible to discover key column from class '{0}' to complete result dictionary keys. " +
-					"Class has no properties or fields or multiple properties or fields with 'AutoIncrementPrimaryKey', 'PrimaryKey' or 'UniqueKey' attributes defined. " +
+					"Class has no properties or fields or multiple properties or fields with 'IdColumn', 'PrimaryKey' or 'UniqueKey' attributes defined. " +
 					"Please define optional param 'keySelector' in method 'ToDictionary()' to complete result " +
 					"dictionary keys.", itemType.FullName
 				))

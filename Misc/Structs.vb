@@ -55,7 +55,7 @@ Public Structure Constants
     Public Shared ColumnAttrType As Type = GetType(ColumnAttribute)
     Public Shared FormatAttrType As Type = GetType(FormatAttribute)
     Public Shared TrimAttrType As Type = GetType(TrimAttribute)
-	Public Shared AutoIncrementPrimaryKeyAttrType As Type = GetType(AutoIncrementPrimaryKeyAttribute)
+	Public Shared IdColumnAttrType As Type = GetType(IdColumnAttribute)
 	Public Shared AutoIncrementAttrType As Type = GetType(AutoIncrementAttribute)
 	Public Shared PrimaryKeyAttrType As Type = GetType(PrimaryKeyAttribute)
 	Public Shared UniqueKeyAttrType As Type = GetType(UniqueKeyAttribute)
