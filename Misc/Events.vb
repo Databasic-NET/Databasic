@@ -1,4 +1,4 @@
-﻿Imports Microsoft.VisualBasic.CompilerServices
+Imports Microsoft.VisualBasic.CompilerServices
 Imports System.Reflection
 Imports System.Web
 Imports System.Web.Hosting
@@ -30,12 +30,25 @@ Public Class Events
 		End If
 	End Sub
 
-	Public Shared Sub RaiseError(ByVal ex As Exception)
+	Public Shared Sub RaiseError(ByRef ex As Exception)
 		If Not Events.HasErrorHandler() Then
 			Throw ex
 		End If
 		Dim errorEvent As ErrorHandler = Events.ErrorEvent
 		If (Not errorEvent Is Nothing) Then errorEvent.Invoke(ex, Nothing)
+	End Sub
+
+	Public Shared Sub RaiseError(errorMessage As String)
+		If Not Events.HasErrorHandler() Then
+			Throw New Exception(errorMessage)
+		Else
+			Try
+				Throw New Exception(errorMessage)
+			Catch ex As Exception
+				Dim errorEvent As ErrorHandler = Events.ErrorEvent
+				If (Not errorEvent Is Nothing) Then errorEvent.Invoke(ex, Nothing)
+			End Try
+		End If
 	End Sub
 
 	Friend Shared Sub StaticInit()

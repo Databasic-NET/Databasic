@@ -1,4 +1,4 @@
-﻿Imports System.Reflection
+Imports System.Reflection
 Imports System.Runtime.CompilerServices
 Imports System.Threading
 
@@ -45,10 +45,10 @@ Partial Public MustInherit Class ProviderResource
 			ProviderResource._columnsLocks(connectionIndex).ExitWriteLock()
 		End If
 		If Not result.HasValue Then
-			Events.RaiseError(New Exception(String.Format(
+			Events.RaiseError(String.Format(
 				"Table '{0}' has no column '{1}' under connection index {2}.",
 				table, column, connectionIndex.ToString()
-			)))
+			))
 		End If
 		Return result
 	End Function
@@ -122,9 +122,9 @@ Partial Public MustInherit Class ProviderResource
 				tablesAndColumns.Add(table, colsAndNulls)
 			End If
 		Else
-			Events.RaiseError(New Exception(
+			Events.RaiseError(
 				$"No columns found for table: '{table}'. Is the table name correct?"
-			))
+			)
 			result = New String() {"*"}
 		End If
 		Return result

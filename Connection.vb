@@ -1,4 +1,4 @@
-﻿Imports System.Data.Common
+Imports System.Data.Common
 Imports System.Reflection
 Imports System.Threading
 
@@ -86,9 +86,9 @@ Partial Public MustInherit Class Connection
 		If Databasic.Connection.NamesAndIndexes.ContainsKey(connectionName) Then
 			Return Databasic.Connection.NamesAndIndexes(connectionName)
 		ElseIf throwException Then
-			Events.RaiseError(New Exception(
+			Events.RaiseError(
 				$"Connection settings under name doesn't exist: {connectionName}."
-			))
+			)
 		End If
 		Return Nothing
 	End Function

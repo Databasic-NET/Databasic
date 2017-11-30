@@ -1,4 +1,4 @@
-﻿Imports System.ComponentModel
+Imports System.ComponentModel
 Imports System.Dynamic
 
 Namespace ActiveRecord
@@ -60,9 +60,9 @@ Namespace ActiveRecord
 			Dim instanceType As Type = GetType(TValue)
 			Dim classMetaDescription As MetaDescription = MetaDescriptor.GetClassDescription(instanceType)
 			If Not classMetaDescription.AutoIncrementColumn.HasValue Then
-				Events.RaiseError(New Exception(
+				Events.RaiseError(
 					$"Class '{classMetaDescription.ClassType}' has no whole number member with 'AutoIncrement' attribute."
-				))
+				)
 			End If
 			Dim statement As Statement = connection.GetProviderResource().GetById(
 				id, connection, classMetaDescription
@@ -79,9 +79,9 @@ Namespace ActiveRecord
 			Dim instanceType As Type = GetType(TValue)
 			Dim classMetaDescription As MetaDescription = MetaDescriptor.GetClassDescription(instanceType)
 			If Not classMetaDescription.AutoIncrementColumn.HasValue Then
-				Events.RaiseError(New Exception(
+				Events.RaiseError(
 					$"Class '{classMetaDescription.ClassType}' has no whole number member with 'AutoIncrement' attribute."
-				))
+				)
 			End If
 			Dim statement As Statement = transaction.ConnectionWrapper.GetProviderResource().GetById(
 				id, transaction, classMetaDescription

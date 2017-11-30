@@ -1,4 +1,4 @@
-﻿Imports System.Threading
+Imports System.Threading
 
 Partial Public MustInherit Class Connection
 
@@ -24,7 +24,7 @@ Partial Public MustInherit Class Connection
 			connectionIndex = Tools.GetConnectionIndexByClassAttr(Tools.GetEntryClassType, True)
 		End If
 		If Not Databasic.Connection.Config.ContainsKey(connectionIndex.Value) Then
-			Events.RaiseError(New Exception($"Connection settings under index doesn't exist: {connectionIndex.Value}."))
+			Events.RaiseError($"Connection settings under index doesn't exist: {connectionIndex.Value}.")
 		End If
 		Dim connection As Databasic.Connection = Nothing
 		Dim processAndThreadKey As String = Databasic.Connection._getProcessAndThreadKey()
@@ -120,7 +120,7 @@ Partial Public MustInherit Class Connection
 		Dim typeAndDsn As String() = Databasic.Connection.Config(connectionIndex)
 		Dim provider As String = typeAndDsn(0).Trim()
 		If Not Databasic.Connection._supportedProviders.ContainsKey(provider) Then
-			Events.RaiseError(New Exception($"Connection provider not installed: '{provider}'."))
+			Events.RaiseError($"Connection provider not installed: '{provider}'.")
 		End If
 		Dim connectionType As Type = Databasic.Connection._supportedProviders(provider)
 		result = Activator.CreateInstance(connectionType)

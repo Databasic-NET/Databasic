@@ -1,4 +1,4 @@
-﻿Imports System.ComponentModel
+Imports System.ComponentModel
 Imports System.Dynamic
 
 Namespace ActiveRecord
@@ -121,11 +121,11 @@ Namespace ActiveRecord
 			ElseIf classDescription.UniqueColumns.ContainsKey(keyName) Then
 				dictionary = classDescription.UniqueColumns.Item(keyName)
 			Else
-				Events.RaiseError(New Exception(If(
+				Events.RaiseError(If(
 					keyName.Length > 0,
 					$"Class '{classDescription.ClassType}' has no member(s) with 'UniqueKey(""{keyName}"")' or 'PrimaryKey(""{keyName}"")' attribute(s).",
 					$"Class '{classDescription.ClassType}' has no member(s) with 'UniqueKey' or 'PrimaryKey' attribute(s)."
-				)))
+				))
 			End If
 			Dim keyParams As New Dictionary(Of String, Object)
 			Dim pair As KeyValuePair(Of String, String)
@@ -133,9 +133,9 @@ Namespace ActiveRecord
 				If keyValues.ContainsKey(pair.Key) Then
 					keyParams.Add(pair.Value, keyValues.Item(pair.Key))
 				Else
-					Events.RaiseError(New Exception(
+					Events.RaiseError(
 						$"Key value '{pair.Key}' to load '{type.FullName}' by key '{keyName}' is missing, please put any record '{pair.Key}' into first param 'keyValues' to load data properly."
-					))
+					)
 				End If
 			Next
 			If connectionTypeGiven Then

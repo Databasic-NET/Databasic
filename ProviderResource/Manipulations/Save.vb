@@ -32,10 +32,10 @@ Partial Public MustInherit Class ProviderResource
                 End If
             Catch ex As Exception
                 If TypeOf trans Is Transaction Then trans.Rollback()
-                Events.RaiseError(New Exception(
-                      $"Inserting of new {instance.GetType().FullName} failed.", ex
-                ))
-            End Try
+				Events.RaiseError(
+					  $"Inserting of new {instance.GetType().FullName} failed.", ex
+				)
+			End Try
             Return result
         End If
     End Function
