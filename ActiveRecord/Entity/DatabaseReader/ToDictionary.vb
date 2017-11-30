@@ -229,6 +229,7 @@ Namespace ActiveRecord
 			itemCompleter As ItemCompleterWithAllInfo,
 			itemType As Type,
 			Optional keyColumnName As String = "",
+			Optional propertiesOnly As Boolean = True,
 			Optional duplicateKeyBehaviour As DuplicateKeyBehaviour = DuplicateKeyBehaviour.ThrownException
 		) As Dictionary(Of Object, Object)
 			Dim result As New Dictionary(Of Object, Object)
@@ -236,11 +237,21 @@ Namespace ActiveRecord
 			Dim columns As New List(Of String),
 				instance As Object,
 				descriptableType As Boolean = Tools.IsDescriptableType(itemType),
-				columnsByDbNames As Dictionary(Of String, Databasic.MemberInfo) = Nothing
-			If (descriptableType) Then
-				columnsByDbNames = MetaDescriptor.GetColumnsByDbNames(itemType)
-			End If
+				columnsByDbNames As New Dictionary(Of String, Databasic.MemberInfo)
 			If reader.HasRows() Then
+				If (descriptableType) Then
+					columnsByDbNames = MetaDescriptor.GetColumnsByDbNames(itemType)
+					If (propertiesOnly) Then
+						columnsByDbNames = (
+							From item In columnsByDbNames
+							Where item.Value.MemberInfoType = MemberInfoType.Prop
+							Select item
+						).ToDictionary(Of String, Databasic.MemberInfo)(
+							Function(item) item.Key,
+							Function(item) item.Value
+						)
+					End If
+				End If
 				While reader.Read()
 					columns = If(columns.Count = 0, ActiveRecord.Entity._getReaderRowColumns(reader), columns)
 					instance = itemCompleter.Invoke(reader, columns, columnsByDbNames)
@@ -258,16 +269,31 @@ Namespace ActiveRecord
 			itemCompleter As ItemCompleterWithAllInfo,
 			itemType As Type,
 			Optional keySelector As Func(Of Object, Object) = Nothing,
+			Optional propertiesOnly As Boolean = True,
 			Optional duplicateKeyBehaviour As DuplicateKeyBehaviour = DuplicateKeyBehaviour.ThrownException
 		) As Dictionary(Of Object, Object)
 			Dim result As New Dictionary(Of Object, Object)
 			If Not TypeOf reader Is DbDataReader Then Return result
 			Dim columns As New List(Of String),
 				instance As Object,
-				columnsByDbNames = MetaDescriptor.GetColumnsByDbNames(itemType),
 				codeKeyColumnName As String = "",
-				isEntity As Boolean? = Nothing
+				isEntity As Boolean? = Nothing,
+				descriptableType As Boolean = Tools.IsDescriptableType(itemType),
+				columnsByDbNames As New Dictionary(Of String, Databasic.MemberInfo)
 			If reader.HasRows() Then
+				If (descriptableType) Then
+					columnsByDbNames = MetaDescriptor.GetColumnsByDbNames(itemType)
+					If (propertiesOnly) Then
+						columnsByDbNames = (
+							From item In columnsByDbNames
+							Where item.Value.MemberInfoType = MemberInfoType.Prop
+							Select item
+						).ToDictionary(Of String, Databasic.MemberInfo)(
+							Function(item) item.Key,
+							Function(item) item.Value
+						)
+					End If
+				End If
 				While reader.Read()
 					columns = If(columns.Count = 0, ActiveRecord.Entity._getReaderRowColumns(reader), columns)
 					instance = itemCompleter.Invoke(reader, columns, columnsByDbNames)

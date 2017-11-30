@@ -1,4 +1,5 @@
 Imports System.Data.Common
+Imports System.IO
 Imports Databasic.ActiveRecord
 
 Public MustInherit Class Statement
@@ -68,5 +69,15 @@ Public MustInherit Class Statement
 	''' </summary>
 	''' <param name="sqlParams">Dictionary with named keys as SQL statement params without any '@' chars in dictionary keys.</param>
 	Protected MustOverride Sub addParamsWithValue(sqlParams As Dictionary(Of String, Object))
+
+
+	Protected Overridable Function getJsonStreamWriter() As StreamWriter
+		Return New StreamWriter(New MemoryStream())
+	End Function
+
+	Protected Overridable Function getJsonStreamWriter(ByRef stream As Stream) As StreamWriter
+		Return New StreamWriter(stream)
+	End Function
+
 
 End Class

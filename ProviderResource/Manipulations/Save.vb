@@ -31,10 +31,12 @@ Partial Public MustInherit Class ProviderResource
                     result = Me.Insert(instance, connection, classMetaDescription)
                 End If
             Catch ex As Exception
-                If TypeOf trans Is Transaction Then trans.Rollback()
-				Events.RaiseError(
-					  $"Inserting of new {instance.GetType().FullName} failed.", ex
-				)
+				If TypeOf trans Is Transaction Then trans.Rollback()
+				Try
+					Throw New Exception($"Inserting of new {instance.GetType().FullName} failed.", ex)
+				Catch e As Exception
+					Events.RaiseError(e)
+				End Try
 			End Try
             Return result
         End If

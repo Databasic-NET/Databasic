@@ -104,17 +104,16 @@ Namespace ActiveRecord
 			If reader.HasRows() Then
 				reader.Read()
 				If Tools.IsDescriptableType(instanceType) Then
+					columnsByDbNames = MetaDescriptor.GetColumnsByDbNames(instanceType)
 					If (propertiesOnly) Then
 						columnsByDbNames = (
-							From item In MetaDescriptor.GetColumnsByDbNames(instanceType)
+							From item In columnsByDbNames
 							Where item.Value.MemberInfoType = MemberInfoType.Prop
 							Select item
 						).ToDictionary(Of String, Databasic.MemberInfo)(
 							Function(item) item.Key,
 							Function(item) item.Value
 						)
-					Else
-						columnsByDbNames = MetaDescriptor.GetColumnsByDbNames(instanceType)
 					End If
 				End If
 				result = instanceCompleter.Invoke(

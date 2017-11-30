@@ -81,8 +81,12 @@
     <Compile Include="ActiveRecord\Entity\DatabaseReader\ToDictionaryTyped.vb" />
     <Compile Include="ActiveRecord\Entity\DatabaseReader\ToDictionary.vb" />
     <Compile Include="ActiveRecord\Entity\DatabaseReader\ToInstanceTyped.vb" />
-    <Compile Include="ActiveRecord\Entity\DatabaseReader\ToJsonTyped.vb" />
-    <Compile Include="ActiveRecord\Entity\DatabaseReader\ToJson.vb" />
+    <Compile Include="ActiveRecord\Entity\DatabaseReader\ToJsonDictionary.vb" />
+    <Compile Include="ActiveRecord\Entity\DatabaseReader\ToJsonInstance.vb" />
+    <Compile Include="ActiveRecord\Entity\DatabaseReader\ToJsonInstanceTyped.vb" />
+    <Compile Include="ActiveRecord\Entity\DatabaseReader\ToJsonList.vb" />
+    <Compile Include="ActiveRecord\Entity\DatabaseReader\ToJsonListTyped.vb" />
+    <Compile Include="ActiveRecord\Entity\DatabaseReader\ToJsonDictionaryTyped.vb" />
     <Compile Include="ActiveRecord\Entity\DatabaseReader\ToListTyped.vb" />
     <Compile Include="ActiveRecord\Entity\DatabaseReader\ToList.vb" />
     <Compile Include="ActiveRecord\Entity\DatabaseReader\ToInstance.vb" />
