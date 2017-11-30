@@ -9,24 +9,29 @@ Namespace ActiveRecord
 		''' specify which column from reader to use to complete dictionary keys.
 		''' If reader has no rows, empty dictionary is returned.
 		''' </summary>
+		''' <typeparam name="TKey">Result dictionary generic type to complete dictionary keys.</typeparam>
+		''' <typeparam name="TValue">Result dictionary generic type to complete dictionary values.</typeparam>
 		''' <param name="reader">Reader with values for new instance properties and fields</param>
 		''' <param name="keyColumnName">Reader column name to use to complete result dictionary keys.</param>
 		''' <param name="duplicateKeyBehaviour">Thrown an Exception if any previous key is already in result set by default, or keep in result set first completed record value or overwrite duplicate key every time with newly completed value.</param>
 		''' <param name="columnsByDbNames">Optional class members meta info, indexed by database column names.</param>
 		''' <returns>Dictionary with keys completed by second param for reader column name, values completed by reader columns with the same names as TActiveRecord type fields/properties.</returns>
-		Friend Shared Function ToDictionary(
+		Friend Shared Function ToDictionary(Of TKey, TValue)(
 			reader As DbDataReader,
-			itemType As Type,
 			Optional keyColumnName As String = "",
 			Optional duplicateKeyBehaviour As DuplicateKeyBehaviour = DuplicateKeyBehaviour.ThrownException,
 			Optional ByRef columnsByDbNames As Dictionary(Of String, Databasic.MemberInfo) = Nothing
-		) As Dictionary(Of Object, Object)
-			Dim result As New Dictionary(Of Object, Object)
+		) As Dictionary(Of TKey, TValue)
+			Dim result As New Dictionary(Of TKey, TValue)
 			If Not TypeOf reader Is DbDataReader Then Return result
 			Dim columns As New List(Of String),
 				instance As Object,
+				itemType As Type = GetType(TValue),
 				descriptableType As Boolean = Tools.IsDescriptableType(itemType)
 			If reader.HasRows() Then
+				If (String.IsNullOrEmpty(keyColumnName)) Then
+					keyColumnName = Entity._autoDiscoverCodeKeyColumnNameIfNecessary(itemType)
+				End If
 				If descriptableType Then
 					Dim isEntity As Boolean = Databasic.Constants.EntityType.IsAssignableFrom(itemType)
 					If (Not TypeOf columnsByDbNames Is Dictionary(Of String, Databasic.MemberInfo)) Then
@@ -34,18 +39,18 @@ Namespace ActiveRecord
 					End If
 					While reader.Read()
 						columns = If(columns.Count = 0, ActiveRecord.Entity._getReaderRowColumns(reader), columns)
-						instance = Activator.CreateInstance(itemType)
+						instance = Activator.CreateInstance(Of TValue)()
 						ActiveRecord.Entity._readerRowToTypedInstance(
 							reader, columns, columnsByDbNames, instance, isEntity
 						)
-						Entity._addInstaceToDictionaryByKeyColumnName(
+						Entity._addInstaceToDictionaryByKeyColumnName(Of TKey, TValue)(
 							reader, result, keyColumnName, instance, duplicateKeyBehaviour
 						)
 					End While
 				ElseIf Tools.IsPrimitiveType(itemType) Then
 					While reader.Read()
-						instance = Convert.ChangeType(reader(0), itemType)
-						Entity._addInstaceToDictionaryByKeyColumnName(
+						instance = DirectCast(reader(0), TValue)
+						Entity._addInstaceToDictionaryByKeyColumnName(Of TKey, TValue)(
 							reader, result, keyColumnName, instance, duplicateKeyBehaviour
 						)
 					End While
@@ -56,7 +61,7 @@ Namespace ActiveRecord
 						ActiveRecord.Entity._readerRowToAnonymousInstance(
 							reader, columns, instance
 						)
-						Entity._addInstaceToDictionaryByKeyColumnName(
+						Entity._addInstaceToDictionaryByKeyColumnName(Of TKey, TValue)(
 							reader, result, keyColumnName, instance, duplicateKeyBehaviour
 						)
 					End While
@@ -71,22 +76,24 @@ Namespace ActiveRecord
 		''' specify which field/property from active record instance to use to complete dictionary key for each item.
 		''' If reader has no rows, empty dictionary is returned.
 		''' </summary>
+		''' <typeparam name="TKey">Result dictionary generic type to complete dictionary keys.</typeparam>
+		''' <typeparam name="TValue">Result dictionary generic type to complete dictionary values.</typeparam>
 		''' <param name="reader">Reader with values for new instance properties and fields</param>
 		''' <param name="keySelector">Anonymous function accepting first argument as TActiveRecord instance and returning it's specific field/property value to complete Dictionary key.</param>
 		''' <param name="duplicateKeyBehaviour">Thrown an Exception if any previous key is already in result set by default, or keep in result set first completed record value or overwrite duplicate key every time with newly completed value.</param>
 		''' <param name="columnsByDbNames">Optional class members meta info, indexed by database column names.</param>
 		''' <returns>Dictionary with keys completed by second anonymous function, values completed by reader columns with the same names as TActiveRecord type fields/properties.</returns>
-		Friend Shared Function ToDictionary(
+		Friend Shared Function ToDictionary(Of TKey, TValue)(
 			reader As DbDataReader,
-			itemType As Type,
-			Optional keySelector As Func(Of Object, Object) = Nothing,
+			Optional keySelector As Func(Of TValue, TKey) = Nothing,
 			Optional duplicateKeyBehaviour As DuplicateKeyBehaviour = DuplicateKeyBehaviour.ThrownException,
 			Optional ByRef columnsByDbNames As Dictionary(Of String, Databasic.MemberInfo) = Nothing
-		) As Dictionary(Of Object, Object)
-			Dim result As New Dictionary(Of Object, Object)
+		) As Dictionary(Of TKey, TValue)
+			Dim result As New Dictionary(Of TKey, TValue)
 			If Not TypeOf reader Is DbDataReader Then Return result
 			Dim columns As New List(Of String),
 				instance As Object,
+				itemType As Type = GetType(TValue),
 				descriptableType As Boolean = Tools.IsDescriptableType(itemType),
 				codeKeyColumnName As String = "",
 				isEntity As Boolean? = Nothing
@@ -98,18 +105,18 @@ Namespace ActiveRecord
 					End If
 					While reader.Read()
 						columns = If(columns.Count = 0, ActiveRecord.Entity._getReaderRowColumns(reader), columns)
-						instance = Activator.CreateInstance(itemType)
+						instance = Activator.CreateInstance(Of TValue)()
 						ActiveRecord.Entity._readerRowToTypedInstance(
 							reader, columns, columnsByDbNames, instance, isEntity.Value
 						)
-						Entity._addInstaceToDictionaryByKeySelector(
+						Entity._addInstaceToDictionaryByKeySelector(Of TKey, TValue)(
 							result, keySelector, instance, duplicateKeyBehaviour, itemType, codeKeyColumnName, isEntity
 						)
 					End While
 				ElseIf Tools.IsPrimitiveType(itemType) Then
 					While reader.Read()
-						instance = Convert.ChangeType(reader(0), itemType)
-						Entity._addInstaceToDictionaryByKeySelector(
+						instance = DirectCast(reader(0), TValue)
+						Entity._addInstaceToDictionaryByKeySelector(Of TKey, TValue)(
 							result, keySelector, instance, duplicateKeyBehaviour, itemType, codeKeyColumnName, isEntity
 						)
 					End While
@@ -120,7 +127,7 @@ Namespace ActiveRecord
 						ActiveRecord.Entity._readerRowToAnonymousInstance(
 							reader, columns, instance
 						)
-						Entity._addInstaceToDictionaryByKeySelector(
+						Entity._addInstaceToDictionaryByKeySelector(Of TKey, TValue)(
 							result, keySelector, instance, duplicateKeyBehaviour, itemType, codeKeyColumnName, isEntity
 						)
 					End While
@@ -130,19 +137,23 @@ Namespace ActiveRecord
 			Return result
 		End Function
 
-		Friend Shared Function ToDictionary(
+		Friend Shared Function ToDictionary(Of TKey, TValue)(
 			reader As DbDataReader,
-			itemCompleter As ItemCompleter,
+			itemCompleter As ItemCompleter(Of TValue),
 			Optional keyColumnName As String = "",
 			Optional duplicateKeyBehaviour As DuplicateKeyBehaviour = DuplicateKeyBehaviour.ThrownException
-		) As Dictionary(Of Object, Object)
-			Dim result As New Dictionary(Of Object, Object)
+		) As Dictionary(Of TKey, TValue)
+			Dim result As New Dictionary(Of TKey, TValue)
 			If Not TypeOf reader Is DbDataReader Then Return result
-			Dim instance As Object
+			Dim instance As TValue,
+				itemType As Type = GetType(TValue)
 			If reader.HasRows() Then
+				If (String.IsNullOrEmpty(keyColumnName)) Then
+					keyColumnName = Entity._autoDiscoverCodeKeyColumnNameIfNecessary(itemType)
+				End If
 				While reader.Read()
 					instance = itemCompleter.Invoke(reader)
-					Entity._addInstaceToDictionaryByKeyColumnName(
+					Entity._addInstaceToDictionaryByKeyColumnName(Of TKey, TValue)(
 						reader, result, keyColumnName, instance, duplicateKeyBehaviour
 					)
 				End While
@@ -151,22 +162,22 @@ Namespace ActiveRecord
 			Return result
 		End Function
 
-		Friend Shared Function ToDictionary(
+		Friend Shared Function ToDictionary(Of TKey, TValue)(
 			reader As DbDataReader,
-			itemCompleter As ItemCompleter,
-			Optional keySelector As Func(Of Object, Object) = Nothing,
+			itemCompleter As ItemCompleter(Of TValue),
+			Optional keySelector As Func(Of TValue, TKey) = Nothing,
 			Optional duplicateKeyBehaviour As DuplicateKeyBehaviour = DuplicateKeyBehaviour.ThrownException
-		) As Dictionary(Of Object, Object)
-			Dim result As New Dictionary(Of Object, Object)
+		) As Dictionary(Of TKey, TValue)
+			Dim result As New Dictionary(Of TKey, TValue)
 			If Not TypeOf reader Is DbDataReader Then Return result
-			Dim instance As Object,
-				itemType As Type = Nothing,
+			Dim instance As TValue,
+				itemType As Type = GetType(TValue),
 				codeKeyColumnName As String = "",
 				isEntity As Boolean? = Nothing
 			If reader.HasRows() Then
 				While reader.Read()
 					instance = itemCompleter.Invoke(reader)
-					Entity._addInstaceToDictionaryByKeySelector(
+					Entity._addInstaceToDictionaryByKeySelector(Of TKey, TValue)(
 						result, keySelector, instance, duplicateKeyBehaviour, itemType, codeKeyColumnName, isEntity
 					)
 				End While
@@ -175,21 +186,25 @@ Namespace ActiveRecord
 			Return result
 		End Function
 
-		Friend Shared Function ToDictionary(
+		Friend Shared Function ToDictionary(Of TKey, TValue)(
 			reader As DbDataReader,
-			itemCompleter As ItemCompleterWithColumns,
+			itemCompleter As ItemCompleterWithColumns(Of TValue),
 			Optional keyColumnName As String = "",
 			Optional duplicateKeyBehaviour As DuplicateKeyBehaviour = DuplicateKeyBehaviour.ThrownException
-		) As Dictionary(Of Object, Object)
-			Dim result As New Dictionary(Of Object, Object)
+		) As Dictionary(Of TKey, TValue)
+			Dim result As New Dictionary(Of TKey, TValue)
 			If Not TypeOf reader Is DbDataReader Then Return result
 			Dim columns As New List(Of String),
-				instance As Object
+				instance As TValue,
+				itemType As Type = GetType(TValue)
 			If reader.HasRows() Then
+				If (String.IsNullOrEmpty(keyColumnName)) Then
+					keyColumnName = Entity._autoDiscoverCodeKeyColumnNameIfNecessary(itemType)
+				End If
 				While reader.Read()
 					columns = If(columns.Count = 0, ActiveRecord.Entity._getReaderRowColumns(reader), columns)
 					instance = itemCompleter.Invoke(reader, columns)
-					Entity._addInstaceToDictionaryByKeyColumnName(
+					Entity._addInstaceToDictionaryByKeyColumnName(Of TKey, TValue)(
 						reader, result, keyColumnName, instance, duplicateKeyBehaviour
 					)
 				End While
@@ -198,24 +213,24 @@ Namespace ActiveRecord
 			Return result
 		End Function
 
-		Friend Shared Function ToDictionary(
+		Friend Shared Function ToDictionary(Of TKey, TValue)(
 			reader As DbDataReader,
-			itemCompleter As ItemCompleterWithColumns,
-			Optional keySelector As Func(Of Object, Object) = Nothing,
+			itemCompleter As ItemCompleterWithColumns(Of TValue),
+			Optional keySelector As Func(Of TValue, TKey) = Nothing,
 			Optional duplicateKeyBehaviour As DuplicateKeyBehaviour = DuplicateKeyBehaviour.ThrownException
-		) As Dictionary(Of Object, Object)
-			Dim result As New Dictionary(Of Object, Object)
+		) As Dictionary(Of TKey, TValue)
+			Dim result As New Dictionary(Of TKey, TValue)
 			If Not TypeOf reader Is DbDataReader Then Return result
 			Dim columns As New List(Of String),
-				instance As Object,
-				itemType As Type = Nothing,
+				instance As TValue,
+				itemType As Type = GetType(TValue),
 				codeKeyColumnName As String = "",
 				isEntity As Boolean? = Nothing
 			If reader.HasRows() Then
 				While reader.Read()
 					columns = If(columns.Count = 0, ActiveRecord.Entity._getReaderRowColumns(reader), columns)
 					instance = itemCompleter.Invoke(reader, columns)
-					Entity._addInstaceToDictionaryByKeySelector(
+					Entity._addInstaceToDictionaryByKeySelector(Of TKey, TValue)(
 						result, keySelector, instance, duplicateKeyBehaviour, itemType, codeKeyColumnName, isEntity
 					)
 				End While
@@ -224,27 +239,30 @@ Namespace ActiveRecord
 			Return result
 		End Function
 
-		Friend Shared Function ToDictionary(
+		Friend Shared Function ToDictionary(Of TKey, TValue)(
 			reader As DbDataReader,
-			itemCompleter As ItemCompleterWithAllInfo,
-			itemType As Type,
+			itemCompleter As ItemCompleterWithAllInfo(Of TValue),
 			Optional keyColumnName As String = "",
 			Optional duplicateKeyBehaviour As DuplicateKeyBehaviour = DuplicateKeyBehaviour.ThrownException
-		) As Dictionary(Of Object, Object)
-			Dim result As New Dictionary(Of Object, Object)
+		) As Dictionary(Of TKey, TValue)
+			Dim result As New Dictionary(Of TKey, TValue)
 			If Not TypeOf reader Is DbDataReader Then Return result
 			Dim columns As New List(Of String),
-				instance As Object,
+				instance As TValue,
+				itemType As Type = GetType(TValue),
 				descriptableType As Boolean = Tools.IsDescriptableType(itemType),
 				columnsByDbNames As Dictionary(Of String, Databasic.MemberInfo) = Nothing
 			If (descriptableType) Then
 				columnsByDbNames = MetaDescriptor.GetColumnsByDbNames(itemType)
 			End If
 			If reader.HasRows() Then
+				If (String.IsNullOrEmpty(keyColumnName)) Then
+					keyColumnName = Entity._autoDiscoverCodeKeyColumnNameIfNecessary(itemType)
+				End If
 				While reader.Read()
 					columns = If(columns.Count = 0, ActiveRecord.Entity._getReaderRowColumns(reader), columns)
 					instance = itemCompleter.Invoke(reader, columns, columnsByDbNames)
-					Entity._addInstaceToDictionaryByKeyColumnName(
+					Entity._addInstaceToDictionaryByKeyColumnName(Of TKey, TValue)(
 						reader, result, keyColumnName, instance, duplicateKeyBehaviour
 					)
 				End While
@@ -253,17 +271,17 @@ Namespace ActiveRecord
 			Return result
 		End Function
 
-		Friend Shared Function ToDictionary(
+		Friend Shared Function ToDictionary(Of TKey, TValue)(
 			reader As DbDataReader,
-			itemCompleter As ItemCompleterWithAllInfo,
-			itemType As Type,
-			Optional keySelector As Func(Of Object, Object) = Nothing,
+			itemCompleter As ItemCompleterWithAllInfo(Of TValue),
+			Optional keySelector As Func(Of TValue, TKey) = Nothing,
 			Optional duplicateKeyBehaviour As DuplicateKeyBehaviour = DuplicateKeyBehaviour.ThrownException
-		) As Dictionary(Of Object, Object)
-			Dim result As New Dictionary(Of Object, Object)
+		) As Dictionary(Of TKey, TValue)
+			Dim result As New Dictionary(Of TKey, TValue)
 			If Not TypeOf reader Is DbDataReader Then Return result
 			Dim columns As New List(Of String),
-				instance As Object,
+				instance As TValue,
+				itemType As Type = GetType(TValue),
 				columnsByDbNames = MetaDescriptor.GetColumnsByDbNames(itemType),
 				codeKeyColumnName As String = "",
 				isEntity As Boolean? = Nothing
@@ -271,7 +289,7 @@ Namespace ActiveRecord
 				While reader.Read()
 					columns = If(columns.Count = 0, ActiveRecord.Entity._getReaderRowColumns(reader), columns)
 					instance = itemCompleter.Invoke(reader, columns, columnsByDbNames)
-					Entity._addInstaceToDictionaryByKeySelector(
+					Entity._addInstaceToDictionaryByKeySelector(Of TKey, TValue)(
 						result, keySelector, instance, duplicateKeyBehaviour, itemType, codeKeyColumnName, isEntity
 					)
 				End While

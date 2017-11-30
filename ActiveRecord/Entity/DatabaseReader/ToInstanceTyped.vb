@@ -6,25 +6,39 @@ Namespace ActiveRecord
 
 	Partial Public MustInherit Class Entity
 
-		Friend Shared Function ToInstance(
-			instanceType As Type,
+		''' <summary>
+		''' Create new instance by generic type and set up all called dictionary keys into new instance properties or fields.
+		''' </summary>
+		''' <typeparam name="TValue">New instance type.</typeparam>
+		''' <param name="data">Data with values for new instance properties and fields.</param>
+		''' <returns>New instance by generic type with values by second param.</returns>
+		Friend Shared Function ToInstance(Of TValue As Entity)(
 			data As Dictionary(Of String, Object)
-		) As Entity
-			Dim instance As Object = Activator.CreateInstance(instanceType)
+		) As TValue
+			Dim instance As TValue = Activator.CreateInstance(Of TValue)()
 			TryCast(instance, Entity).SetUp(data, True)
 			Return instance
 		End Function
-
-		Friend Shared Function ToInstance(
+		''' <summary>
+		''' Create new instance by generic type and set up all called reader columns with one row at minimal into 
+		''' new instance properties or fields. If TValue is primitive type, reader has to return single row and 
+		''' single column select result and that result is converted and returned as to primitive value only.
+		''' If reader has no rows, Nothing is returned.
+		''' </summary>
+		''' <typeparam name="TValue">New result class instance type or any primitive type for single row and single column select result.</typeparam>
+		''' <param name="reader">Reader with values for new instance properties and fields.</param>
+		''' <param name="columnsByDbNames">Optional class members meta info, indexed by database column names.</param>
+		''' <returns>New instance as primitive type or as class instance, completed by reader columns with the same names as TActiveRecord type fields/properties.</returns>
+		Friend Shared Function ToInstance(Of TValue)(
 			reader As DbDataReader,
-			instanceType As Type,
 			Optional ByRef columnsByDbNames As Dictionary(
 				Of String, Databasic.MemberInfo
 			) = Nothing
-		) As Object
+		) As TValue
 			Dim result As Object = Nothing
 			If Not TypeOf reader Is DbDataReader Then Return result
 			Dim columns As New List(Of String)
+			Dim instanceType = GetType(TValue)
 			If reader.HasRows() Then
 				reader.Read()
 				If Tools.IsDescriptableType(instanceType) Then
@@ -33,7 +47,7 @@ Namespace ActiveRecord
 					) Then
 						columnsByDbNames = MetaDescriptor.GetColumnsByDbNames(instanceType)
 					End If
-					result = Activator.CreateInstance(instanceType)
+					result = Activator.CreateInstance(Of TValue)()
 					columns = If(
 						columns.Count = 0,
 						ActiveRecord.Entity._getReaderRowColumns(reader),
@@ -61,10 +75,10 @@ Namespace ActiveRecord
 			Return result
 		End Function
 
-		Friend Shared Function ToInstance(
+		Friend Shared Function ToInstance(Of TValue)(
 			reader As DbDataReader,
-			instanceCompleter As InstanceCompleter
-		) As Object
+			instanceCompleter As InstanceCompleter(Of TValue)
+		) As TValue
 			Dim result As Object = Nothing
 			If Not TypeOf reader Is DbDataReader Then Return result
 			If reader.HasRows() Then
@@ -75,10 +89,10 @@ Namespace ActiveRecord
 			Return result
 		End Function
 
-		Friend Shared Function ToInstance(
+		Friend Shared Function ToInstance(Of TValue)(
 			reader As DbDataReader,
-			instanceCompleter As InstanceCompleterWithColumns
-		) As Object
+			instanceCompleter As InstanceCompleterWithColumns(Of TValue)
+		) As TValue
 			Dim result As Object = Nothing
 			If Not TypeOf reader Is DbDataReader Then Return result
 			If reader.HasRows() Then
@@ -92,15 +106,15 @@ Namespace ActiveRecord
 			Return result
 		End Function
 
-		Friend Shared Function ToInstance(
+		Friend Shared Function ToInstance(Of TValue)(
 			reader As DbDataReader,
-			instanceCompleter As InstanceCompleterWithAllInfo,
-			instanceType As Type,
+			instanceCompleter As InstanceCompleterWithAllInfo(Of TValue),
 			Optional propertiesOnly As Boolean = True
-		) As Object
+		) As TValue
 			Dim result As Object = Nothing
 			If Not TypeOf reader Is DbDataReader Then Return result
-			Dim columnsByDbNames As New Dictionary(Of String, Databasic.MemberInfo)
+			Dim instanceType = GetType(TValue),
+				columnsByDbNames As New Dictionary(Of String, Databasic.MemberInfo)
 			If reader.HasRows() Then
 				reader.Read()
 				If Tools.IsDescriptableType(instanceType) Then

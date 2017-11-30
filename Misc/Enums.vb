@@ -1,4 +1,4 @@
-﻿<Flags>
+<Flags>
 Public Enum CommandBehavior
 	CloseConnection = &H20
 	[Default] = 0
@@ -66,4 +66,11 @@ Public Enum ProviderName
 	''' SQLite database - System.Data.SQLite
 	''' </summary>
 	SQLite
+End Enum
+
+Public Enum Json
+	Auto
+	Instance
+	Array
+	[Object]
 End Enum

@@ -1,4 +1,4 @@
-﻿Imports System.ComponentModel
+Imports System.ComponentModel
 Imports System.Dynamic
 
 Namespace ActiveRecord
@@ -24,12 +24,12 @@ Namespace ActiveRecord
 			)
 		End Function
 		Public Shared Function GetList(Of TValue)(
-			Optional conditionSqlStatement As String = "",
-			Optional conditionParams As Dictionary(Of String, Object) = Nothing,
-			Optional orderBySqlStatement As String = "",
-			Optional offset As Int64? = Nothing,
-			Optional limit As Int64? = Nothing,
-			Optional connectionIndex As Int32? = Nothing
+			conditionSqlStatement As String,
+			conditionParams As Dictionary(Of String, Object),
+			orderBySqlStatement As String,
+			offset As Int64?,
+			limit As Int64?,
+			connectionIndex As Int32?
 		) As List(Of TValue)
 			Return Entity.GetList(Of TValue)(
 				conditionSqlStatement, conditionParams,

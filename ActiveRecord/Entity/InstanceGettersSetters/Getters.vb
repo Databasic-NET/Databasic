@@ -29,95 +29,95 @@ Namespace ActiveRecord
                     memberNames = classMembersInfo.Keys.ToList()
                 End If
                 For Each memberName As String In memberNames
-                    result.Add(
-                        memberName,
-                        If(Me._initialData.ContainsKey(memberName), Me._initialData(memberName), Nothing)
-                    )
-                Next
-            Else
-                If Not TypeOf classMembersInfo Is Dictionary(Of String, Databasic.MemberInfo) Then
-                    classMembersInfo = MetaDescriptor.GetColumnsByCodeNames(Me.GetType())
-                End If
-                If Not TypeOf memberNames Is List(Of String) Then memberNames = classMembersInfo.Keys.ToList()
-                Dim member As Databasic.MemberInfo
-                Dim memberValue As Object
-                Dim asserted As Boolean
-                For Each memberName As String In memberNames
-                    memberValue = Nothing
-                    asserted = False
-                    If classMembersInfo.ContainsKey(memberName) Then
-                        member = classMembersInfo(memberName)
-                        If member.MemberInfoType = MemberInfoType.Prop Then
-                            Dim pi As Reflection.PropertyInfo = DirectCast(member.MemberInfo, Reflection.PropertyInfo)
-                            If pi.CanRead Then
-                                memberValue = pi.GetValue(Me, Nothing)
-                                asserted = True
-                            End If
-                        Else
-                            Dim fi As Reflection.FieldInfo = DirectCast(member.MemberInfo, Reflection.FieldInfo)
-                            memberValue = fi.GetValue(Me)
-                            asserted = True
-                        End If
-                    End If
-                    If Not asserted AndAlso Me._reserveStore.ContainsKey(memberName) Then
-                        memberValue = Me._reserveStore(memberName)
-                    End If
-                    result.Add(memberName, memberValue)
-                Next
-            End If
-            Return result
-        End Function
+					result.Add(
+						memberName,
+						If(Me.getInitialData().ContainsKey(memberName), Me.getInitialData()(memberName), Nothing)
+					)
+				Next
+			Else
+				If Not TypeOf classMembersInfo Is Dictionary(Of String, Databasic.MemberInfo) Then
+					classMembersInfo = MetaDescriptor.GetColumnsByCodeNames(Me.GetType())
+				End If
+				If Not TypeOf memberNames Is List(Of String) Then memberNames = classMembersInfo.Keys.ToList()
+				Dim member As Databasic.MemberInfo
+				Dim memberValue As Object
+				Dim asserted As Boolean
+				For Each memberName As String In memberNames
+					memberValue = Nothing
+					asserted = False
+					If classMembersInfo.ContainsKey(memberName) Then
+						member = classMembersInfo(memberName)
+						If member.MemberInfoType = MemberInfoType.Prop Then
+							Dim pi As Reflection.PropertyInfo = DirectCast(member.MemberInfo, Reflection.PropertyInfo)
+							If pi.CanRead Then
+								memberValue = pi.GetValue(Me, Nothing)
+								asserted = True
+							End If
+						Else
+							Dim fi As Reflection.FieldInfo = DirectCast(member.MemberInfo, Reflection.FieldInfo)
+							memberValue = fi.GetValue(Me)
+							asserted = True
+						End If
+					End If
+					If Not asserted AndAlso Me.getReserveStore().ContainsKey(memberName) Then
+						memberValue = Me.getReserveStore()(memberName)
+					End If
+					result.Add(memberName, memberValue)
+				Next
+			End If
+			Return result
+		End Function
 
 
 
 
 
-        ''' <summary>
-        ''' Set up all data from dictionary into current instance properties or fields with or without touching (with touching by default).
-        ''' </summary>
-        ''' <param name="data">Dictionary with any values, named as instance fields and properties.</param>
-        ''' <param name="asInitialData">True to fill data into initial Dictionary to compare them later by GetTouched() function.</param>
-        Public Overridable Sub SetUp(data As Dictionary(Of String, Object), Optional asInitialData As Boolean = False)
-            For Each pair As KeyValuePair(Of String, Object) In data
-                Me.[Set](pair.Key, pair.Value, asInitialData)
-            Next
-        End Sub
+		''' <summary>
+		''' Set up all data from dictionary into current instance properties or fields with or without touching (with touching by default).
+		''' </summary>
+		''' <param name="data">Dictionary with any values, named as instance fields and properties.</param>
+		''' <param name="asInitialData">True to fill data into initial Dictionary to compare them later by GetTouched() function.</param>
+		Public Overridable Sub SetUp(data As Dictionary(Of String, Object), Optional asInitialData As Boolean = False)
+			For Each pair As KeyValuePair(Of String, Object) In data
+				Me.[Set](pair.Key, pair.Value, asInitialData)
+			Next
+		End Sub
 
 
 
 
 
-        ''' <summary>
-        ''' Get touched properties and fields in Dictionary. Get everything, what is different 
-        ''' to Me._initialData dictionary, filled in instance initial set up.
-        ''' </summary>
-        ''' <param name="keysByCode">If false (by default), get touched fields in dictionary with keys by code names, if true, get touched fields in dictionary with keys by database names.</param>
-        ''' <param name="classMembersInfo">Databasic meta descriptor info about class members, optional.</param>
-        ''' <returns>Dictionary with values, which are different from initial set up.</returns>
-        Public Overridable Function GetTouched(
-            Optional keysByCode As Boolean = False,
-            Optional classMembersInfo As Dictionary(Of String, Databasic.MemberInfo) = Nothing
-        ) As Dictionary(Of String, Object)
-            Dim touched As New Dictionary(Of String, Object)
-            Dim initialValue As Object
-            Dim currentValue As Object
-            Dim initialType As Type
-            Dim currentType As Type
-            Dim instanceType As Type = Me.GetType()
-            If Not TypeOf classMembersInfo Is Dictionary(Of String, Databasic.MemberInfo) Then
-                classMembersInfo = MetaDescriptor.GetColumnsByCodeNames(instanceType)
-            End If
-            For Each current As KeyValuePair(Of String, Databasic.MemberInfo) In classMembersInfo
-                initialValue = Nothing
-                If current.Value.MemberInfoType = MemberInfoType.Prop Then
-                    currentValue = DirectCast(current.Value.MemberInfo, Reflection.PropertyInfo).GetValue(Me, Nothing)
-                Else
-                    currentValue = DirectCast(current.Value.MemberInfo, Reflection.FieldInfo).GetValue(Me)
-                End If
-                If Me._initialData.ContainsKey(current.Key) Then
-                    initialValue = Me._initialData(current.Key)
-                End If
-                initialType = If(initialValue IsNot Nothing, initialValue.GetType(), Nothing)
+		''' <summary>
+		''' Get touched properties and fields in Dictionary. Get everything, what is different 
+		''' to Me.initialData dictionary, filled in instance initial set up.
+		''' </summary>
+		''' <param name="keysByCode">If false (by default), get touched fields in dictionary with keys by code names, if true, get touched fields in dictionary with keys by database names.</param>
+		''' <param name="classMembersInfo">Databasic meta descriptor info about class members, optional.</param>
+		''' <returns>Dictionary with values, which are different from initial set up.</returns>
+		Public Overridable Function GetTouched(
+			Optional keysByCode As Boolean = False,
+			Optional classMembersInfo As Dictionary(Of String, Databasic.MemberInfo) = Nothing
+		) As Dictionary(Of String, Object)
+			Dim touched As New Dictionary(Of String, Object)
+			Dim initialValue As Object
+			Dim currentValue As Object
+			Dim initialType As Type
+			Dim currentType As Type
+			Dim instanceType As Type = Me.GetType()
+			If Not TypeOf classMembersInfo Is Dictionary(Of String, Databasic.MemberInfo) Then
+				classMembersInfo = MetaDescriptor.GetColumnsByCodeNames(instanceType)
+			End If
+			For Each current As KeyValuePair(Of String, Databasic.MemberInfo) In classMembersInfo
+				initialValue = Nothing
+				If current.Value.MemberInfoType = MemberInfoType.Prop Then
+					currentValue = DirectCast(current.Value.MemberInfo, Reflection.PropertyInfo).GetValue(Me, Nothing)
+				Else
+					currentValue = DirectCast(current.Value.MemberInfo, Reflection.FieldInfo).GetValue(Me)
+				End If
+				If Me.getInitialData().ContainsKey(current.Key) Then
+					initialValue = Me.getInitialData()(current.Key)
+				End If
+				initialType = If(initialValue IsNot Nothing, initialValue.GetType(), Nothing)
                 currentType = If(current.Value.Value IsNot Nothing, current.Value.Type, Nothing)
                 If (
                     initialType IsNot Nothing AndAlso

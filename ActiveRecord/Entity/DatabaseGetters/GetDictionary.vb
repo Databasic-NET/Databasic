@@ -6,7 +6,7 @@ Namespace ActiveRecord
 		Inherits DynamicObject
 
 		Public Shared Function GetDictionary(Of TKey, TValue)(
-			Optional databaseKeyColumnName As String = "",
+			Optional keyColumnName As String = "",
 			Optional conditionSqlStatement As String = "",
 			Optional conditionParams As Object = Nothing,
 			Optional orderBySqlStatement As String = "",
@@ -15,7 +15,7 @@ Namespace ActiveRecord
 			Optional connectionIndex As Int32? = Nothing
 		) As Dictionary(Of TKey, TValue)
 			Return Entity.GetDictionary(Of TKey, TValue)(
-				databaseKeyColumnName, conditionSqlStatement,
+				keyColumnName, conditionSqlStatement,
 				conditionParams, orderBySqlStatement, offset, limit,
 				Databasic.Connection.Get(If(
 					connectionIndex.HasValue,
@@ -25,7 +25,7 @@ Namespace ActiveRecord
 			)
 		End Function
 		Public Shared Function GetDictionary(Of TKey, TValue)(
-			Optional databaseKeyColumnName As String = "",
+			Optional keyColumnName As String = "",
 			Optional conditionSqlStatement As String = "",
 			Optional conditionParams As Dictionary(Of String, Object) = Nothing,
 			Optional orderBySqlStatement As String = "",
@@ -34,7 +34,7 @@ Namespace ActiveRecord
 			Optional connectionIndex As Int32? = Nothing
 		) As Dictionary(Of TKey, TValue)
 			Return Entity.GetDictionary(Of TKey, TValue)(
-				databaseKeyColumnName, conditionSqlStatement,
+				keyColumnName, conditionSqlStatement,
 				conditionParams, orderBySqlStatement, offset, limit,
 				Databasic.Connection.Get(If(
 					connectionIndex.HasValue,
@@ -44,7 +44,7 @@ Namespace ActiveRecord
 			)
 		End Function
 		Public Shared Function GetDictionary(Of TKey, TValue)(
-			databaseKeyColumnName As String,
+			keyColumnName As String,
 			conditionSqlStatement As String,
 			conditionParams As Object,
 			orderBySqlStatement As String,
@@ -53,7 +53,7 @@ Namespace ActiveRecord
 			connectionName As String
 		) As Dictionary(Of TKey, TValue)
 			Return Entity.GetDictionary(Of TKey, TValue)(
-				databaseKeyColumnName, conditionSqlStatement,
+				keyColumnName, conditionSqlStatement,
 				conditionParams, orderBySqlStatement, offset, limit,
 				Databasic.Connection.Get(If(
 					String.IsNullOrEmpty(connectionName),
@@ -63,7 +63,7 @@ Namespace ActiveRecord
 			)
 		End Function
 		Public Shared Function GetDictionary(Of TKey, TValue)(
-			databaseKeyColumnName As String,
+			keyColumnName As String,
 			conditionSqlStatement As String,
 			conditionParams As Dictionary(Of String, Object),
 			orderBySqlStatement As String,
@@ -72,7 +72,7 @@ Namespace ActiveRecord
 			connectionName As String
 		) As Dictionary(Of TKey, TValue)
 			Return Entity.GetDictionary(Of TKey, TValue)(
-				databaseKeyColumnName, conditionSqlStatement,
+				keyColumnName, conditionSqlStatement,
 				conditionParams, orderBySqlStatement, offset, limit,
 				Databasic.Connection.Get(If(
 					String.IsNullOrEmpty(connectionName),
@@ -82,7 +82,7 @@ Namespace ActiveRecord
 			)
 		End Function
 		Public Shared Function GetDictionary(Of TKey, TValue)(
-			databaseKeyColumnName As String,
+			keyColumnName As String,
 			conditionSqlStatement As String,
 			conditionParams As Object,
 			orderBySqlStatement As String,
@@ -94,7 +94,7 @@ Namespace ActiveRecord
 				conditionSqlStatement, conditionParams,
 				orderBySqlStatement, offset, limit, connection,
 				MetaDescriptor.GetClassDescription(GetType(TValue))
-			).ToDictionary(Of TKey, TValue)(databaseKeyColumnName)
+			).ToDictionary(Of TKey, TValue)(keyColumnName)
 		End Function
 
 		Public Shared Function GetDictionary(Of TKey, TValue)(

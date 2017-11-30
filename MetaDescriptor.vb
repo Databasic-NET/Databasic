@@ -202,16 +202,17 @@ Public Class MetaDescriptor
     End Function
 
     Private Shared Sub _completeColumnsCollections(type As Type, ByRef result As MetaDescription)
-        Dim codeColumnName As String, dbColumnName As String,
-            columnAttr As ColumnAttribute,
-            formatAttr As FormatAttribute, formatProvider As IFormatProvider,
-            trimAttr As TrimAttribute, trimChars As Char(), keyName As String,
-            primaryKeyAttr As PrimaryKeyAttribute,
-            uniqueKeyAttr As UniqueKeyAttribute,
-            autoIncrementAttr As AutoIncrementAttribute,
-            useEnumUnderlyingValueAttr As UseEnumUnderlyingValue,
-        reflMemberInfo As Reflection.MemberInfo
-        result.ColumnsByCodeNames = New Dictionary(Of String, Databasic.MemberInfo)
+		Dim codeColumnName As String, dbColumnName As String,
+			columnAttr As ColumnAttribute,
+			formatAttr As FormatAttribute, formatProvider As IFormatProvider,
+			trimAttr As TrimAttribute, trimChars As Char(), keyName As String,
+			autoIncrementPrimaryKeyAttr As AutoIncrementPrimaryKeyAttribute,
+			autoIncrementAttr As AutoIncrementAttribute,
+			primaryKeyAttr As PrimaryKeyAttribute,
+			uniqueKeyAttr As UniqueKeyAttribute,
+			useEnumUnderlyingValueAttr As UseEnumUnderlyingValue,
+		reflMemberInfo As Reflection.MemberInfo
+		result.ColumnsByCodeNames = New Dictionary(Of String, Databasic.MemberInfo)
         result.ColumnsByDatabaseNames = New Dictionary(Of String, Databasic.MemberInfo)
         result.PrimaryColumns = New Dictionary(Of String, Dictionary(Of String, String))
         result.UniqueColumns = New Dictionary(Of String, Dictionary(Of String, String))
@@ -221,11 +222,12 @@ Public Class MetaDescriptor
             reflMemberInfo = item.Value.MemberInfo
             columnAttr = DirectCast(Attribute.GetCustomAttribute(reflMemberInfo, Constants.ColumnAttrType), ColumnAttribute)
             formatAttr = DirectCast(Attribute.GetCustomAttribute(reflMemberInfo, Constants.FormatAttrType), FormatAttribute)
-            trimAttr = DirectCast(Attribute.GetCustomAttribute(reflMemberInfo, Constants.TrimAttrType), TrimAttribute)
-            primaryKeyAttr = DirectCast(Attribute.GetCustomAttribute(reflMemberInfo, Constants.PrimaryKeyAttrType), PrimaryKeyAttribute)
-            uniqueKeyAttr = DirectCast(Attribute.GetCustomAttribute(reflMemberInfo, Constants.UniqueKeyAttrType), UniqueKeyAttribute)
-            autoIncrementAttr = DirectCast(Attribute.GetCustomAttribute(reflMemberInfo, Constants.AutoIncrementAttrType), AutoIncrementAttribute)
-            useEnumUnderlyingValueAttr = DirectCast(Attribute.GetCustomAttribute(item.Value.Type, Constants.UseEnumUnderlyingValuesAttrType), UseEnumUnderlyingValue)
+			trimAttr = DirectCast(Attribute.GetCustomAttribute(reflMemberInfo, Constants.TrimAttrType), TrimAttribute)
+			autoIncrementPrimaryKeyAttr = DirectCast(Attribute.GetCustomAttribute(reflMemberInfo, Constants.AutoIncrementPrimaryKeyAttrType), AutoIncrementPrimaryKeyAttribute)
+			autoIncrementAttr = DirectCast(Attribute.GetCustomAttribute(reflMemberInfo, Constants.AutoIncrementAttrType), AutoIncrementAttribute)
+			primaryKeyAttr = DirectCast(Attribute.GetCustomAttribute(reflMemberInfo, Constants.PrimaryKeyAttrType), PrimaryKeyAttribute)
+			uniqueKeyAttr = DirectCast(Attribute.GetCustomAttribute(reflMemberInfo, Constants.UniqueKeyAttrType), UniqueKeyAttribute)
+			useEnumUnderlyingValueAttr = DirectCast(Attribute.GetCustomAttribute(item.Value.Type, Constants.UseEnumUnderlyingValuesAttrType), UseEnumUnderlyingValue)
             codeColumnName = reflMemberInfo.Name
             dbColumnName = codeColumnName
             keyName = ""
@@ -255,18 +257,21 @@ Public Class MetaDescriptor
                 .Value = Nothing,
                 .UseEnumUnderlyingValue = TypeOf useEnumUnderlyingValueAttr Is UseEnumUnderlyingValue
             })
-            ' if there is any key info at class element, add it into keys info collections
-            If TypeOf primaryKeyAttr Is PrimaryKeyAttribute Then
-                If Not String.IsNullOrEmpty(primaryKeyAttr.KeyName) Then keyName = primaryKeyAttr.KeyName
-                If result.PrimaryColumns.ContainsKey(keyName) Then
-                    result.PrimaryColumns(keyName).Add(codeColumnName, dbColumnName)
-                Else
-                    result.PrimaryColumns.Add(keyName, New Dictionary(Of String, String)() From {
-                        {codeColumnName, dbColumnName}
-                    })
-                End If
-            End If
-            If TypeOf uniqueKeyAttr Is UniqueKeyAttribute Then
+			' if there is any key info at class element, add it into keys info collections
+			If (
+				TypeOf primaryKeyAttr Is PrimaryKeyAttribute OrElse
+				TypeOf autoIncrementPrimaryKeyAttr Is AutoIncrementPrimaryKeyAttribute
+			) Then
+				If Not String.IsNullOrEmpty(primaryKeyAttr.KeyName) Then keyName = primaryKeyAttr.KeyName
+				If result.PrimaryColumns.ContainsKey(keyName) Then
+					result.PrimaryColumns(keyName).Add(codeColumnName, dbColumnName)
+				Else
+					result.PrimaryColumns.Add(keyName, New Dictionary(Of String, String)() From {
+						{codeColumnName, dbColumnName}
+					})
+				End If
+			End If
+			If TypeOf uniqueKeyAttr Is UniqueKeyAttribute Then
                 If Not String.IsNullOrEmpty(uniqueKeyAttr.KeyName) Then keyName = uniqueKeyAttr.KeyName
                 If result.UniqueColumns.ContainsKey(keyName) Then
                     result.UniqueColumns(keyName).Add(codeColumnName, dbColumnName)
@@ -276,21 +281,24 @@ Public Class MetaDescriptor
                     })
                 End If
             End If
-            If TypeOf autoIncrementAttr Is AutoIncrementAttribute Then
-                If Not result.AutoIncrementColumn.HasValue Then
-                    result.AutoIncrementColumn = New AutoIncrementColumn With {
-                        .CodeColumnName = codeColumnName,
-                        .DatabaseColumnName = dbColumnName
-                    }
-                Else
-                    Throw New Exception(String.Format(
-                        "Class '{0}' has defined multiple autoincrement members. " +
-                        "Plase define only one field or property with attribute '{1}'.",
-                        type.FullName, "AutoIncrement"
-                    ))
-                End If
-            End If
-        Next
+			If (
+				TypeOf autoIncrementAttr Is AutoIncrementAttribute OrElse
+				TypeOf autoIncrementPrimaryKeyAttr Is AutoIncrementPrimaryKeyAttribute
+			) Then
+				If Not result.AutoIncrementColumn.HasValue Then
+					result.AutoIncrementColumn = New AutoIncrementColumn With {
+						.CodeColumnName = codeColumnName,
+						.DatabaseColumnName = dbColumnName
+					}
+				Else
+					Throw New Exception(String.Format(
+						"Class '{0}' has defined multiple autoincrement members. " +
+						"Plase define only one field or property with attribute '{1}'.",
+						type.FullName, "AutoIncrement"
+					))
+				End If
+			End If
+		Next
     End Sub
 
 End Class

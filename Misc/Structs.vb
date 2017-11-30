@@ -44,20 +44,22 @@ Public Structure Defaults
 End Structure
 
 Public Structure Constants
-    ''' <summary>
-    ''' String type code value, used frequently in Entity._readerRowToInstance.
-    ''' </summary>
-    Public Shared ReadOnly StringTypeCode As TypeCode = Type.GetTypeCode(GetType(String))
+	''' <summary>
+	''' String type code value, used frequently in Entity._readerRowToInstance.
+	''' </summary>
+	Public Shared ReadOnly StringTypeCode As TypeCode = Type.GetTypeCode(GetType(String))
+	Public Shared ReadOnly EntityType As Type = GetType(Databasic.ActiveRecord.Entity)
 
-    Public Shared ConnectionAttrType As Type = GetType(ConnectionAttribute)
+	Public Shared ConnectionAttrType As Type = GetType(ConnectionAttribute)
     Public Shared TableAttrType As Type = GetType(TableAttribute)
     Public Shared ColumnAttrType As Type = GetType(ColumnAttribute)
     Public Shared FormatAttrType As Type = GetType(FormatAttribute)
     Public Shared TrimAttrType As Type = GetType(TrimAttribute)
-    Public Shared PrimaryKeyAttrType As Type = GetType(PrimaryKeyAttribute)
-    Public Shared UniqueKeyAttrType As Type = GetType(UniqueKeyAttribute)
-    Public Shared AutoIncrementAttrType As Type = GetType(AutoIncrementAttribute)
-    Public Shared UseEnumUnderlyingValuesAttrType As Type = GetType(UseEnumUnderlyingValue)
+	Public Shared AutoIncrementPrimaryKeyAttrType As Type = GetType(AutoIncrementPrimaryKeyAttribute)
+	Public Shared AutoIncrementAttrType As Type = GetType(AutoIncrementAttribute)
+	Public Shared PrimaryKeyAttrType As Type = GetType(PrimaryKeyAttribute)
+	Public Shared UniqueKeyAttrType As Type = GetType(UniqueKeyAttribute)
+	Public Shared UseEnumUnderlyingValuesAttrType As Type = GetType(UseEnumUnderlyingValue)
 End Structure
 
 Friend Structure ProviderNames

@@ -1,4 +1,4 @@
-﻿#==========================================================
+#==========================================================
 # Edit the variable values below to configure how your .nupkg file is packed (i.e. created) and pushed (i.e. uploaded) to the NuGet gallery.
 #
 # If you have modified this script:
@@ -58,7 +58,7 @@ $appendConfigurationAndPlatformToNuGetPackageFileName = $true
 $sourceToUploadTo = ""
 
 # The API Key to use to upload the package to the gallery. If not provided and a system-level one does not exist for the specified Source, you will be prompted for it.
-$apiKey = ""
+$apiKey = "83cd4dba-8c38-4e5b-ba84-7f584dbd67c7"
 
 # Specify any NuGet Push options to pass to nuget.exe.
 #	e.g. $pushOptions = "-Timeout 120"
